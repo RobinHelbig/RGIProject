@@ -92,8 +92,8 @@ def evaluation(documents: List[Document]):
     print("evaluation")
 
 print("Start")
-visualize("VisualizeOutput1.txt", mockData(), 1)
-visualize("VisualizeOutput2.txt", mockData(), 2)
-visualize("VisualizeOutput3.txt", mockData(), 3)
+# visualize("VisualizeOutput1.txt", mockData(), 1)
+# visualize("VisualizeOutput2.txt", mockData(), 2)
+# visualize("VisualizeOutput3.txt", mockData(), 3)
 documents = read_files()
 print("Test")

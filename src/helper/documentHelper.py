@@ -14,11 +14,9 @@ def read_files() -> [Document]:
     for category in categories:
         news_folder_path = os.path.join(rootDic, newsDic, category)
         summary_folder_path = os.path.join(rootDic, summaryDic, category)
-        print(news_folder_path)
         for f in os.listdir(news_folder_path):
             news_path = os.path.join(news_folder_path, f)
             summary_path = os.path.join(summary_folder_path, f)
-            print(news_path, summary_path)
             if os.path.isfile(news_path) and os.path.isfile(summary_path):
                 news = open(news_path, "r", encoding='iso-8859-15').read()
                 reference_summary = open(summary_path, "r", encoding='iso-8859-15').read()
