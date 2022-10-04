@@ -4,9 +4,9 @@ from data.document import Document
 from helper.mockDataVisualize import mockData
 import os
 documents : List[Document]
+from src.helper.documentHelper import read_files
 
-def readDocuments():
-    print("read documents")
+documents : [Document]
 
 def indexing():
     print("indexing")
@@ -91,8 +91,9 @@ def write_plain(sentence:str, file_html):
 def evaluation(documents: List[Document]):
     print("evaluation")
 
-
 print("Start")
 visualize("VisualizeOutput1.txt", mockData(), 1)
 visualize("VisualizeOutput2.txt", mockData(), 2)
 visualize("VisualizeOutput3.txt", mockData(), 3)
+documents = read_files()
+print("Test")
