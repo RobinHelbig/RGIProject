@@ -54,24 +54,46 @@ def get_tfidfs(terms: [str], inverted_index: {str: IndexEntry}, corpus_inverted_
     return tfidfs
 
 
-def ranking(document: Document, max_sentences: int, max_chars: int, order_ranked: bool, corpus_inverted_index: {str: IndexEntry}, args: {str: any}):
-    sum_option = args["sum_option"] if args["sum_option"] is not None else "tf-idf" #"tf", "tf-idf", "bm25", "RRF"
-    preprocessing = args["preprocessing"] if args["preprocessing"] is not None else False #True, False
-    mmr = args["mmr"] if args["mmr"] is not None else False #True, False
+def rank_sentences(sentences: [str], preprocessing: bool, corpus_inverted_index: {str: IndexEntry}, rank_option: str, current_summary: [str]) -> [(str, int)]:
+    inverted_index = indexing(sentences, preprocessing)
 
-    inverted_index = indexing(document.text_sentences, preprocessing)
-
-    for sentence in document.text_sentences:
+    for sentence in sentences:
         tokens = getTokens(sentence, preprocessing)
 
         tfs = get_tfs(tokens, inverted_index)
 
         tfidfs = get_tfidfs(tokens, inverted_index, corpus_inverted_index)
 
+    #return sentence : score ordered by position in text
 
+def ranking(document: Document, max_sentences: int, max_chars: int, order_ranked: bool, corpus_inverted_index: {str: IndexEntry}, args: {str: any}):
+    rank_option = args["rank_option"] if args["rank_option"] is not None else "tf-idf" #"tf", "tf-idf", "bm25", "RRF"
+    preprocessing = args["preprocessing"] if args["preprocessing"] is not None else False #True, False
+    mmr = args["mmr"] if args["mmr"] is not None else False #True, False
 
+    summary = list[str]()
 
+    if not mmr:
+        #retrieve ranked sentences
+        ranked_sentences = rank_sentences()
+        while True:
+            if len(summary) == max_sentences:
+                break
 
+            next_sentence: str = #sentence highest score
+
+            if max_chars is not None:
+                char_count = 0
+                for sentence in summary:
+                    char_count += len(sentence)
+                if char_count + len(next_sentence) > max_chars:
+                    break
+
+            #summary append next highest scored sentence with order_ranked parameter in mind
+
+            if mmr:
+                #if mmr rank sentences again
+                ranked_sentences = rank_sentences()
 
 
 
