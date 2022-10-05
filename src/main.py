@@ -3,14 +3,13 @@ from typing import List, Optional, Dict
 from data.document import Document
 from helper.mockDataVisualize import mockData
 import os
+
+from src.mainFunctions.indexing import indexing
+
 documents : List[Document]
 from src.helper.documentHelper import read_files
 
 documents : [Document]
-
-def indexing():
-    print("indexing")
-
 
 def ranking():
     print("ranking")
@@ -96,4 +95,5 @@ print("Start")
 # visualize("VisualizeOutput2.txt", mockData(), 2)
 # visualize("VisualizeOutput3.txt", mockData(), 3)
 documents = read_files()
+index = indexing(documents)
 print("Test")
