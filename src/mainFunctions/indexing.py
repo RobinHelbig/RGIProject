@@ -6,7 +6,7 @@ from src.data.index import IndexEntry, Occurrence
 
 def indexing(documents: [Document]):
     print("indexing")
-    inverted_index = {}
+    inverted_index: {str: IndexEntry} = {}
     for document in documents:
         document_word_dict = getWordDict(document)
         for document_word in document_word_dict:
