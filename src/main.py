@@ -1,21 +1,22 @@
+from operator import attrgetter
 from turtle import title
 from typing import List, Optional, Dict
+
+import nltk
+
 from data.document import Document
 from helper.mockDataVisualize import mockData
 import os
 
 from src.mainFunctions.indexing import indexing
-
-documents : List[Document]
 from src.helper.documentHelper import read_files
-
-documents : [Document]
 
 def ranking():
     print("ranking")
 
 """pass every document you want to evaluate (for example just one document or all of a certain category"""
 
+# (document: [str], ranking: [str]) document -> all sentences in order they appear in article, ranking -> all sentences of summary orderd by rank
 def visualize(name: str, ranking: Dict[str, int], option: int):
     # Creating the HTML file
     cur_dir = os.getcwd()
@@ -95,5 +96,5 @@ print("Start")
 # visualize("VisualizeOutput2.txt", mockData(), 2)
 # visualize("VisualizeOutput3.txt", mockData(), 3)
 documents = read_files()
-index = indexing(documents)
+index = indexing(map(attrgetter('text'), documents), False)
 print("Test")

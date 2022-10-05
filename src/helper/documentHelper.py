@@ -1,6 +1,7 @@
 import os
 
 from src.data.document import Document
+from src.helper.textProcessingHelper import getSentences
 
 rootDic = './BBC News Summary'
 newsDic = 'News Articles'
@@ -20,7 +21,7 @@ def read_files() -> [Document]:
             if os.path.isfile(news_path) and os.path.isfile(summary_path):
                 news = open(news_path, "r", encoding='iso-8859-15').read()
                 reference_summary = open(summary_path, "r", encoding='iso-8859-15').read()
-                document = Document(doc_id, category, news, reference_summary, None)
+                document = Document(doc_id, category, news, getSentences(news), reference_summary, None)
                 documents.append(document)
                 doc_id += 1
     return documents
