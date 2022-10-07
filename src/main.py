@@ -1,25 +1,14 @@
-
+#
 # nltk.download('punkt')
 # nltk.download('averaged_perceptron_tagger')
 # nltk.download('maxent_ne_chunker')
 # nltk.download('words')
 
-from src.mainFunctions.evaluation import draw_precision_recall_curve
+import os
+from typing import List, Dict
 
 from src.data.document import Document
-
-from operator import attrgetter
-from turtle import title
-from typing import List, Optional, Dict
-
-import nltk
-
-from data.document import Document
-from helper.mockDataVisualize import mockData
-import os
-
-from src.mainFunctions.indexing import indexing
-from src.helper.documentHelper import read_files
+from src.mainFunctions.evaluation import draw_precision_recall_curve
 
 documents: [Document]
 
@@ -108,7 +97,7 @@ def write_plain(sentence:str, file_html):
 
 #def evaluation(documents: [Document]):
 
-def evaluation(documents: List[Document]):
+def evaluation(documents: [Document]):
     print("evaluation")
     draw_precision_recall_curve()
 
@@ -116,9 +105,9 @@ print("Start")
 # visualize("VisualizeOutput1.txt", mockData(), 1)
 # visualize("VisualizeOutput2.txt", mockData(), 2)
 # visualize("VisualizeOutput3.txt", mockData(), 3)
-documents = read_files()
-index = indexing(map(attrgetter('text'), documents), False)
-print("Test")
+# documents = read_files()
+# index = indexing(map(attrgetter('text'), documents), False)
+# print("Test")
 
 test_doc = Document(1, 'bussines', 'some text', 'referenceSummary', 'summary')
 evaluation(test_doc)
