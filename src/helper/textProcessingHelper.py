@@ -5,7 +5,7 @@ def getSentences(text: str) -> [str]:
     return nltk.sent_tokenize(str)
 
 
-def getTokens(text: str, preprocessing: bool) -> [str]:
+def getTerms(text: str, preprocessing: bool) -> [str]:
     words = nltk.word_tokenize(text)
 
     if preprocessing:

@@ -4,30 +4,30 @@ import nltk
 
 from src.data.document import Document
 from src.data.index import IndexEntry, Occurrence
-from src.helper.textProcessingHelper import getTokens
+from src.helper.textProcessingHelper import getTerms
 
 
-def indexing(corpus: [str], preprocessing: bool) -> {str: IndexEntry}:
+def indexing(corpus: list[list[str]]) -> {str: IndexEntry}:
     print("indexing")
     inverted_index: {str: IndexEntry} = {}
 
-    text_id = 0
+    document_id = 0
 
-    for text in corpus:
-        text_word_dict = getWordDict(text, preprocessing)
-        for text_word in text_word_dict:
-            text_word_count = text_word_dict[text_word]
+    for document in corpus:
+        term_dict = getTermDict(document)
+        for term in term_dict:
+            term_count = term_dict[term]
 
             index_entry = IndexEntry(0, 0, [])
-            if text_word in inverted_index:
-                index_entry = inverted_index[text_word]
+            if term in inverted_index:
+                index_entry = inverted_index[term]
 
             index_entry.document_frequency += 1
-            index_entry.documents.append(Occurrence(text_id, text_word_count))
+            index_entry.occurrences.append(Occurrence(document_id, term_count))
 
-            inverted_index.update({text_word: index_entry})
+            inverted_index.update({term: index_entry})
 
-            text_id += 0
+            document_id += 0
 
     for entry in inverted_index:
         inverted_index[entry].inverted_document_frequency = log10(inverted_index[entry].document_frequency/len(corpus))
@@ -35,9 +35,9 @@ def indexing(corpus: [str], preprocessing: bool) -> {str: IndexEntry}:
     return inverted_index
 
 
-def getWordDict(text: str, preprocessing: bool) -> {str: int}:
+def getTermDict(text: list[str]) -> {str: int}:
     word_dict = {str: int}
-    for word in getTokens(text, preprocessing):
+    for word in text:
         count = 1
         if word in word_dict:
             count = word_dict.get(word) + 1

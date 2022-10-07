@@ -10,6 +10,6 @@ class Occurrence:
 class IndexEntry:
     document_frequency: int
     inverted_document_frequency: float
-    documents: list[Occurrence]
+    occurrences: list[Occurrence]
 
 
