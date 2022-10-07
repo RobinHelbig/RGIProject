@@ -2,14 +2,15 @@ from math import log10
 
 import nltk
 
-from src.data.document import Document
-from src.data.index import IndexEntry, Occurrence
-from src.helper.textProcessingHelper import getTokens
+from data.document import Document
+from data.index import IndexEntry, Occurrence
+from helper.textProcessingHelper import getTokens
+from typing import Dict, List
 
 
-def indexing(corpus: [str], preprocessing: bool) -> {str: IndexEntry}:
+def indexing(corpus: List[str], preprocessing: bool) -> Dict[str: IndexEntry]:
     print("indexing")
-    inverted_index: {str: IndexEntry} = {}
+    inverted_index: Dict[str: IndexEntry] = {}
 
     text_id = 0
 
@@ -35,7 +36,7 @@ def indexing(corpus: [str], preprocessing: bool) -> {str: IndexEntry}:
     return inverted_index
 
 
-def getWordDict(text: str, preprocessing: bool) -> {str: int}:
+def getWordDict(text: str, preprocessing: bool) -> Dict[str: int]:
     word_dict = {str: int}
     for word in getTokens(text, preprocessing):
         count = 1

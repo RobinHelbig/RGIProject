@@ -1,5 +1,5 @@
 from random import randrange
-from typing import Dict
+from typing import Dict, List
 
 #I assume that we can a dict in form of:
 # key = sentence
@@ -17,5 +17,16 @@ Duis posuere mauris non ipsum porttitor, ut ultricies nulla auctor. Curabitur el
     split_by_dot = lorem_ipsum.split(".")
     ranking_dict = {}
     for sentence in split_by_dot:
-        ranking_dict[sentence] = randrange(5)  
+        ranking_dict[sentence] = randrange(3)  
     return ranking_dict
+
+def transfer_function_output_ranking(list_of_sentences: List[str], most_important_sentences: List[str]) -> Dict[str, int]:
+    ranking = {}
+    for sentence in list_of_sentences:
+        if sentence in most_important_sentences:
+            if most_important_sentences.index(sentence)> (len(most_important_sentences)/2):
+                ranking[sentence] = 1
+            else:
+                ranking[sentence] = 2
+        else:
+            ranking[sentence] = 0

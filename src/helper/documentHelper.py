@@ -1,7 +1,9 @@
 import os
 
-from src.data.document import Document
-from src.helper.textProcessingHelper import getSentences
+from data.document import Document
+from helper.textProcessingHelper import getSentences
+
+from typing import List 
 
 rootDic = './BBC News Summary'
 newsDic = 'News Articles'
@@ -9,7 +11,7 @@ summaryDic = 'Summaries'
 #categories = Category._member_names_
 categories = ['business', 'entertainment', 'politics', 'sport', 'tech']
 
-def read_files() -> [Document]:
+def read_files() -> List[Document]:
     documents = list[Document]()
     doc_id = 1
     for category in categories:
