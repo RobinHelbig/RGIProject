@@ -201,6 +201,7 @@ def ranking(document: Document, max_sentences: int, max_chars: int, order_ranked
                         break
 
                 summary.insert(pos, (next_sentence_index, next_sentence_text))
+                summary_char_count += len(next_sentence_text)
 
     if mmr is True:
         current_document_terms: list[(int, list[str])] = list()
@@ -235,5 +236,6 @@ def ranking(document: Document, max_sentences: int, max_chars: int, order_ranked
                         break
 
                 summary.insert(pos, (next_sentence_index, next_sentence_text))
+                summary_char_count += len(next_sentence_text)
 
     return [s[1] for s in summary]

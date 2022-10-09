@@ -122,8 +122,11 @@ corpus_idfs: {str: float} = {}
 for v in index:
     corpus_idfs[v] = index[v].inverted_document_frequency
 
-summary_test = ranking(documents[0], 5, None, False, corpus_idfs, {"rank_option": "rrf", "mmr": True})
-print(summary_test)
+for document in documents:
+    summary_test = ranking(document, 7, None, True, corpus_idfs, {"rank_option": "rrf", "mmr": False})
+    print(document.id, summary_test)
+
+
 #map to term -> idf
 #ranking
 # print("Test")
