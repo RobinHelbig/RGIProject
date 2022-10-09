@@ -8,7 +8,6 @@ from src.helper.textProcessingHelper import getTerms
 
 
 def indexing(corpus: list[list[str]]) -> {str: IndexEntry}:
-    print("indexing")
     inverted_index: {str: IndexEntry} = {}
 
     document_id = 0
@@ -27,10 +26,10 @@ def indexing(corpus: list[list[str]]) -> {str: IndexEntry}:
 
             inverted_index.update({term: index_entry})
 
-            document_id += 0
+        document_id += 1
 
     for entry in inverted_index:
-        inverted_index[entry].inverted_document_frequency = log10(inverted_index[entry].document_frequency/len(corpus))
+        inverted_index[entry].inverted_document_frequency = log10(len(corpus)/inverted_index[entry].document_frequency)
 
     return inverted_index
 

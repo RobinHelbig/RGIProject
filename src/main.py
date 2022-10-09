@@ -3,6 +3,8 @@
 # nltk.download('averaged_perceptron_tagger')
 # nltk.download('maxent_ne_chunker')
 # nltk.download('words')
+# nltk.download('averaged_perceptron_tagger')
+# nltk.download('stopwords')
 
 from src.mainFunctions.evaluation import draw_precision_recall_curve
 
@@ -20,11 +22,9 @@ import os
 
 from src.mainFunctions.indexing import indexing
 from src.helper.documentHelper import read_files
+from src.mainFunctions.ranking import ranking
 
 documents: [Document]
-
-def ranking():
-    print("ranking")
 
 
 """pass every document you want to evaluate (for example just one document or all of a certain category"""
@@ -116,11 +116,17 @@ print("Start")
 # visualize("VisualizeOutput1.txt", mockData(), 1)
 # visualize("VisualizeOutput2.txt", mockData(), 2)
 # visualize("VisualizeOutput3.txt", mockData(), 3)
-documents = read_files()
-#index = indexing(list(map(attrgetter('text_sentences_terms'), documents)))
+documents = read_files(True)
+index = indexing(list(map(attrgetter('text_terms'), documents)))
+corpus_idfs: {str: float} = {}
+for v in index:
+    corpus_idfs[v] = index[v].inverted_document_frequency
+
+summary_test = ranking(documents[0], 5, None, False, corpus_idfs, {"rank_option": "rrf", "mmr": True})
+print(summary_test)
 #map to term -> idf
 #ranking
-print("Test")
-
-test_doc = Document(1, 'bussines', 'some text', 'referenceSummary', 'summary')
-evaluation(test_doc)
+# print("Test")
+#
+# test_doc = Document(1, 'bussines', 'some text', 'referenceSummary', 'summary')
+# evaluation(test_doc)
