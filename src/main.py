@@ -117,7 +117,7 @@ print("Start")
 # visualize("VisualizeOutput2.txt", mockData(), 2)
 # visualize("VisualizeOutput3.txt", mockData(), 3)
 documents = read_files()
-index = indexing(list(map(attrgetter('text_sentences_terms'), documents)))
+#index = indexing(list(map(attrgetter('text_sentences_terms'), documents)))
 #map to term -> idf
 #ranking
 print("Test")
