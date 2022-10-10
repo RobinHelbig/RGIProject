@@ -5,6 +5,8 @@
 # nltk.download('words')
 # nltk.download('averaged_perceptron_tagger')
 # nltk.download('stopwords')
+# nltk.download('wordnet')
+# nltk.download('omw-1.4')
 
 # from src.mainFunctions.evaluation import calcualte_true_pos
 from src.mainFunctions.evaluation import calculate_precision_recall
@@ -58,9 +60,10 @@ corpus_idfs: {str: float} = {}
 for v in index:
     corpus_idfs[v] = index[v].inverted_document_frequency
 
-for document in documents:
-    summary_test = ranking(document, 7, None, True, corpus_idfs, {"rank_option": "rrf", "mmr": False})
-    print(document.id, summary_test)
+summary_test = ranking(documents[0], 7, None, True, corpus_idfs, {"rank_option": "rrf", "mmr": False})
+# for document in documents:
+#     summary_test = ranking(document, 7, None, True, corpus_idfs, {"rank_option": "rrf", "mmr": False})
+#     print(document.id, summary_test)
 
 
 #map to term -> idf
