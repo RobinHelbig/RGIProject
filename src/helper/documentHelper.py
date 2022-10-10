@@ -6,7 +6,8 @@ from src.helper.textProcessingHelper import getSentences, getTerms
 
 from typing import List 
 
-rootDic = './BBC News Summary'
+dirname = os.path.dirname(__file__)
+rootDic = os.path.join(dirname, '../../BBC News Summary')
 newsDic = 'News Articles'
 summaryDic = 'Summaries'
 #categories = Category._member_names_
