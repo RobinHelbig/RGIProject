@@ -4,6 +4,8 @@ from src.data.document import Document
 from src.helper.helper import extract_sentences
 from src.helper.textProcessingHelper import getSentences, getTerms
 
+from typing import List 
+
 rootDic = './BBC News Summary'
 newsDic = 'News Articles'
 summaryDic = 'Summaries'

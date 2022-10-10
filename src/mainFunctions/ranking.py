@@ -1,4 +1,9 @@
 from math import log10
+from data.document import Document
+from data.index import IndexEntry
+from helper.textProcessingHelper import getSentences, getTokens
+from mainFunctions.indexing import indexing
+from typing import List, Dict
 
 from src.data.document import Document
 from src.data.index import IndexEntry
