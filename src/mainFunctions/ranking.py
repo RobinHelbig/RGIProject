@@ -9,8 +9,13 @@ from src.mainFunctions.indexing import indexing
 
 def get_tfs(sentence_terms: [str], inverted_index: {str: IndexEntry}) -> float:
     tf_score: float = 0.0
+    done_terms = list()
 
     for term in sentence_terms:
+        if term in done_terms:  # only add tf of each term once, otherwise sentence with multiple times the same word would benefit
+            continue
+        done_terms.append(term)
+
         i = inverted_index[term]
 
         tf = i.document_frequency
