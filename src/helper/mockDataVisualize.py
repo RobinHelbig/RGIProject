@@ -20,6 +20,7 @@ Duis posuere mauris non ipsum porttitor, ut ultricies nulla auctor. Curabitur el
         ranking_dict[sentence] = randrange(3)  
     return ranking_dict
 
+
 def transfer_function_output_ranking(list_of_sentences: List[str], most_important_sentences: List[str]) -> Dict[str, int]:
     ranking = {}
     for sentence in list_of_sentences:

@@ -13,7 +13,8 @@ summaryDic = 'Summaries'
 # categories = ['business', 'entertainment', 'politics', 'sport', 'tech']
 categories = ['business']
 
-def read_files(prepcrocessing: bool) -> [Document]:
+
+def read_files(prepcrocessing: bool) -> list[Document]:
     documents = list[Document]()
     doc_id = 1
     for category in categories:

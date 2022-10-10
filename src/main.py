@@ -1,8 +1,12 @@
-
+# import nltk
 # nltk.download('punkt')
 # nltk.download('averaged_perceptron_tagger')
 # nltk.download('maxent_ne_chunker')
 # nltk.download('words')
+# nltk.download('averaged_perceptron_tagger')
+# nltk.download('stopwords')
+# nltk.download('wordnet')
+# nltk.download('omw-1.4')
 
 # from src.mainFunctions.evaluation import calcualte_true_pos
 from src.mainFunctions.evaluation import calculate_precision_recall
@@ -24,11 +28,9 @@ from helper.mockDataVisualize import mockData
 
 from src.mainFunctions.indexing import indexing
 from src.helper.documentHelper import read_files
+from src.mainFunctions.ranking import ranking
 
 documents: [Document]
-
-def ranking():
-    print("ranking")
 
 
 """pass every document you want to evaluate (for example just one document or all of a certain category"""
@@ -52,9 +54,28 @@ print("Start")
 # visualize("VisualizeOutput1.txt", mockData(), 1)
 # visualize("VisualizeOutput2.txt", mockData(), 2)
 # visualize("VisualizeOutput3.txt", mockData(), 3)
-documents = read_files()
-index = indexing(map(attrgetter('text'), documents), False)
-print("Test")
 
-test_doc = Document(1, 'bussines', 'some text', 'referenceSummary', 'summary')
-evaluation(test_doc)
+# documents_no_preprocessing = read_files(False)
+# documents_preprocessing = read_files(True)
+
+order_ranked = True
+text_processing = True
+documents = read_files(text_processing)
+index = indexing(list(map(attrgetter('text_terms'), documents)))
+corpus_idfs: {str: float} = {}
+for v in index:
+    corpus_idfs[v] = index[v].inverted_document_frequency
+
+for document in documents:
+    document.summary = ranking(document, 7, None, order_ranked, corpus_idfs, {"rank_option": "rrf", "mmr": False})
+    # print(document.id, document.summary)
+
+    document_sentences = document.text_sentences
+    summary_sentences = document.summary
+    reference_summary_sentences = document.referenceSummary
+    # visualize
+    # evaluate
+
+
+# test_doc = Document(1, 'bussines', 'some text', 'referenceSummary', 'summary')
+# evaluation(test_doc)
