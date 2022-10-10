@@ -54,21 +54,24 @@ print("Start")
 # visualize("VisualizeOutput1.txt", mockData(), 1)
 # visualize("VisualizeOutput2.txt", mockData(), 2)
 # visualize("VisualizeOutput3.txt", mockData(), 3)
+
+order_ranked = True
 documents = read_files(True)
 index = indexing(list(map(attrgetter('text_terms'), documents)))
 corpus_idfs: {str: float} = {}
 for v in index:
     corpus_idfs[v] = index[v].inverted_document_frequency
 
-summary_test = ranking(documents[0], 7, None, True, corpus_idfs, {"rank_option": "rrf", "mmr": False})
-# for document in documents:
-#     summary_test = ranking(document, 7, None, True, corpus_idfs, {"rank_option": "rrf", "mmr": False})
-#     print(document.id, summary_test)
+for document in documents:
+    document.summary = ranking(document, 7, None, order_ranked, corpus_idfs, {"rank_option": "rrf", "mmr": False})
+    # print(document.id, document.summary)
+
+    document_sentences = document.text_sentences
+    summary_sentences = document.summary
+    reference_summary_sentences = document.referenceSummary
+    # visualize
+    # evaluate
 
 
-#map to term -> idf
-#ranking
-# print("Test")
-#
 # test_doc = Document(1, 'bussines', 'some text', 'referenceSummary', 'summary')
 # evaluation(test_doc)
