@@ -55,8 +55,12 @@ print("Start")
 # visualize("VisualizeOutput2.txt", mockData(), 2)
 # visualize("VisualizeOutput3.txt", mockData(), 3)
 
+# documents_no_preprocessing = read_files(False)
+# documents_preprocessing = read_files(True)
+
 order_ranked = True
-documents = read_files(True)
+text_processing = True
+documents = read_files(text_processing)
 index = indexing(list(map(attrgetter('text_terms'), documents)))
 corpus_idfs: {str: float} = {}
 for v in index:
