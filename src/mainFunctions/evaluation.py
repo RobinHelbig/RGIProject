@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from src.helper import helper
-from src.data.document import Document
+import helper
+from data.document import Document
 
 def calculate_precision_recall(documents):
     reference_summary_path = '../BBC News Summary/Summaries/business/001.txt'
