@@ -11,8 +11,8 @@ rootDic = os.path.join(dirname, '../../BBC News Summary')
 newsDic = 'News Articles'
 summaryDic = 'Summaries'
 #categories = Category._member_names_
-# categories = ['business', 'entertainment', 'politics', 'sport', 'tech']
-categories = ['business']
+categories = ['business', 'entertainment', 'politics', 'sport', 'tech']
+# categories = ['business']
 
 
 def read_files(prepcrocessing: bool) -> list[Document]:
@@ -26,6 +26,7 @@ def read_files(prepcrocessing: bool) -> list[Document]:
             summary_path = os.path.join(summary_folder_path, f)
             if os.path.isfile(news_path) and os.path.isfile(summary_path):
                 text = open(news_path, "r", encoding='iso-8859-15').read()
+                text = text.split("\n\n", 1)[1]  # remove headline
                 text_terms = list[str]()
                 text_sentences = getSentences(text)
                 text_sentences_terms: list[list[str]] = list()
@@ -37,7 +38,6 @@ def read_files(prepcrocessing: bool) -> list[Document]:
                     text_sentences_avg_length += len(sentence)
 
                 text_sentences_avg_length = text_sentences_avg_length / len(text_sentences)
-
                 reference_summary = extract_sentences(open(summary_path, "r", encoding='iso-8859-15').read())
                 document = Document(doc_id, category, text, text_terms, text_sentences, text_sentences_terms, text_sentences_avg_length, reference_summary, None)
                 documents.append(document)

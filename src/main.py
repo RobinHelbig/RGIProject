@@ -67,12 +67,14 @@ for v in index:
     corpus_idfs[v] = index[v].inverted_document_frequency
 
 for document in documents:
-    document.summary = ranking(document, 7, None, order_ranked, corpus_idfs, {"rank_option": "rrf", "mmr": False})
-    # print(document.id, document.summary)
+    if "Air Jamaica" in document.text:
+        document.summary = ranking(document, 7, None, order_ranked, corpus_idfs, {"rank_option": "rrf", "mmr": True})
+        # print(document.id, document.summary)
 
-    document_sentences = document.text_sentences
-    summary_sentences = document.summary
-    reference_summary_sentences = document.referenceSummary
+        document_sentences = document.text_sentences
+        summary_sentences = document.summary
+        reference_summary_sentences = document.referenceSummary
+        print(document_sentences, summary_sentences)
     # visualize
     # evaluate
 

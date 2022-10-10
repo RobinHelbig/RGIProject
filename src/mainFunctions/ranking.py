@@ -85,12 +85,13 @@ def get_BM25(document_terms: [str], sentence_index: int, sentence_length: float,
 def mmr_next_sentence(current_document: list[(int, list[str])], current_summary: list[(int, list[str])],
                       corpus_idfs: {str: float}) -> (int, [str]):
     lam = 0.5
-
     document_terms: list[str] = []
     sentence_terms: list[list[str]] = []
     for sentence in current_document:
         sentence_terms.append(sentence[1])
         document_terms += sentence[1]
+    for sentence in current_summary:
+        sentence_terms.append(sentence[1])
 
     inverted_index = indexing(sentence_terms)
     document_tfidfs = get_tfidfs(document_terms, -1, inverted_index, corpus_idfs)
@@ -122,9 +123,9 @@ def mmr_next_sentence(current_document: list[(int, list[str])], current_summary:
 
     best_sentence = sorted(sentence_scores, key=lambda x: x[1], reverse=True)[0]
     best_sentence_index = best_sentence[0]
-    best_sentence_terms = current_document[best_sentence_index][1]
+    best_sentence = list(filter(lambda d: d[0] == best_sentence_index, current_document))[0]
 
-    return best_sentence_index, best_sentence_terms
+    return best_sentence
 
 
 def rank_sentences(document: Document, corpus_idfs: {str: float}, rank_option: str) -> list[(int, str, int)]:
@@ -151,13 +152,15 @@ def rank_sentences(document: Document, corpus_idfs: {str: float}, rank_option: s
                 doc_score = document_tfidfs[term]  # if the word is in the sentence, it will be in the doc too
                 tfidf_score += score * doc_score
 
-            sim_scores.append((sentence_terms_index, sentence, tfidf_score))
+            if rank_option == "tf-idf":
+                sim_scores.append((sentence_terms_index, sentence, tfidf_score))
 
         if rank_option == "bm25" or rank_option == "rrf":  # normalized over sentence length
             bm25_score = get_BM25(document.text_terms, sentence_terms_index, len(sentence),
                                   document.text_sentences_avg_length, inverted_index, corpus_idfs)
 
-            sim_scores.append((sentence_terms_index, sentence, bm25_score))
+            if rank_option == "bm25":
+                sim_scores.append((sentence_terms_index, sentence, bm25_score))
         if rank_option == "rrf":
             my = 5
             rrf_score = (1 / (my + tf_score)) + (
@@ -177,7 +180,10 @@ def ranking(document: Document, max_sentences: int, max_chars: int, order_ranked
 
     if mmr is False:
         ranked_sentences = sorted(rank_sentences(document, corpus_idfs, rank_option), key=lambda x: x[2], reverse=True)
+
         while True:
+            if len(ranked_sentences) == 0:
+                break
             if len(summary) == max_sentences:
                 break
 
@@ -212,6 +218,8 @@ def ranking(document: Document, max_sentences: int, max_chars: int, order_ranked
             current_document_terms.append((sentence_terms_index, sentence_terms))
 
         while True:
+            if len(current_document_terms) == 0:
+                break
             if len(summary) == max_sentences:
                 break
 
@@ -225,6 +233,7 @@ def ranking(document: Document, max_sentences: int, max_chars: int, order_ranked
                     break
 
             current_summary_terms.append((next_sentence_index, next_sentence_terms))
+            current_document_terms.remove((next_sentence_index, next_sentence_terms))
 
             if order_ranked:
                 summary.append((next_sentence_index, next_sentence_text))
