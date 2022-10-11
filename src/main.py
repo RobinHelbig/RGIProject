@@ -67,14 +67,26 @@ for v in index:
     corpus_idfs[v] = index[v].inverted_document_frequency
 
 for document in documents:
-    if "Air Jamaica" in document.text:
-        document.summary = ranking(document, 7, None, order_ranked, corpus_idfs, {"rank_option": "rrf", "mmr": True})
+    # if "Air Jamaica" in document.text:
+        document.summary = ranking(document, 3, None, order_ranked, corpus_idfs, {"rank_option": "tf", "mmr": False})
         # print(document.id, document.summary)
 
         document_sentences = document.text_sentences
         summary_sentences = document.summary
         reference_summary_sentences = document.referenceSummary
-        print(document_sentences, summary_sentences)
+        print("tf", summary_sentences)
+
+        summary2 = ranking(document, 3, None, order_ranked, corpus_idfs, {"rank_option": "tf-idf", "mmr": False})
+        print("tfidf", summary2)
+
+        summary3 = ranking(document, 3, None, order_ranked, corpus_idfs, {"rank_option": "bm25", "mmr": False})
+        print("bm25",summary3)
+
+        summary4 = ranking(document, 3, None, order_ranked, corpus_idfs, {"rank_option": "rrf", "mmr": False})
+        print("rrf",summary4)
+
+        summary5 = ranking(document, 3, None, order_ranked, corpus_idfs, {"rank_option": "tf-idf", "mmr": True})
+        print("mmr",summary5)
     # visualize
     # evaluate
 

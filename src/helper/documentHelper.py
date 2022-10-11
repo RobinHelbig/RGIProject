@@ -11,8 +11,8 @@ rootDic = os.path.join(dirname, '../../BBC News Summary')
 newsDic = 'News Articles'
 summaryDic = 'Summaries'
 #categories = Category._member_names_
-categories = ['business', 'entertainment', 'politics', 'sport', 'tech']
-# categories = ['business']
+# categories = ['business', 'entertainment', 'politics', 'sport', 'tech']
+categories = ['business']
 
 
 def read_files(prepcrocessing: bool) -> list[Document]:
