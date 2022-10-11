@@ -11,14 +11,14 @@ rootDic = os.path.join(dirname, '../../BBC News Summary')
 newsDic = 'News Articles'
 summaryDic = 'Summaries'
 #categories = Category._member_names_
-# categories = ['business', 'entertainment', 'politics', 'sport', 'tech']
-categories = ['business']
+categories_default = ['business', 'entertainment', 'politics', 'sport', 'tech']
 
 
-def read_files(prepcrocessing: bool) -> list[Document]:
+def read_files(prepcrocessing: bool, categories: list[str] = None) -> list[Document]:
     documents = list[Document]()
     doc_id = 1
-    for category in categories:
+    c = categories if categories else categories_default
+    for category in c:
         news_folder_path = os.path.join(rootDic, newsDic, category)
         summary_folder_path = os.path.join(rootDic, summaryDic, category)
         for f in os.listdir(news_folder_path):
