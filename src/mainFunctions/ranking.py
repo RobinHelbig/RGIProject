@@ -91,24 +91,28 @@ def mmr_next_sentence(current_document: list[(int, list[str])], current_summary:
                       corpus_idfs: {str: float}) -> (int, [str]):
     lam = 0.5
     document_terms: list[str] = []
-    sentence_terms: list[list[str]] = []
+    sentence_terms_current_document: list[list[str]] = []
     for sentence in current_document:
-        sentence_terms.append(sentence[1])
+        sentence_terms_current_document.append(sentence[1])
         document_terms += sentence[1]
-    for sentence in current_summary:
-        sentence_terms.append(sentence[1])
 
-    inverted_index = indexing(sentence_terms)
-    document_tfidfs = get_tfidfs(document_terms, -1, inverted_index, corpus_idfs)
+    sentence_terms_current_summary: list[list[str]] = []
+    for sentence in current_summary:
+        sentence_terms_current_summary.append(sentence[1])
+
+    inverted_index_current_document = indexing(sentence_terms_current_document)
+    inverted_index_current_summary = indexing(sentence_terms_current_summary)
+
+    document_tfidfs = get_tfidfs(document_terms, -1, inverted_index_current_document, corpus_idfs)
     current_summary_tfidfs: list[{str: float}] = list()
 
     for sentence in current_summary:
-        tfidfs = get_tfidfs(sentence[1], sentence[0], inverted_index, corpus_idfs)
+        tfidfs = get_tfidfs(sentence[1], sentence[0], inverted_index_current_summary, corpus_idfs)
         current_summary_tfidfs.append(tfidfs)
 
     sentence_scores = list[(int, int)]()
     for sentence in current_document:
-        tfidfs = get_tfidfs(sentence[1], sentence[0], inverted_index, corpus_idfs)
+        tfidfs = get_tfidfs(sentence[1], sentence[0], inverted_index_current_document, corpus_idfs)
 
         sim_sentence_document = 0.0
         for term in tfidfs:
