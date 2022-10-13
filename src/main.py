@@ -79,9 +79,15 @@ print("Start")
 # visualize("VisualizeOutput2.txt", mockData(), 2)
 # visualize("VisualizeOutput3.txt", mockData(), 3)
 
+
 # documents_no_preprocessing = read_files(False)
 # documents_preprocessing = read_files(True)
 #
+
+documents_preprocessing = read_files(True, ["business"])
+print("HI")
+documents_preprocessing2 = read_files(True)
+
 order_ranked = True
 text_processing = True
 documents = read_files(text_processing)
@@ -100,7 +106,25 @@ for document in documents:
 
 # visualize
 # evaluate
+    # if "Air Jamaica" in document.text:
+        document.summary = ranking(document, 3, None, order_ranked, corpus_idfs, {"rank_option": "tf", "mmr": False})
+        # print(document.id, document.summary)
 
+        document_sentences = document.text_sentences
+        summary_sentences = document.summary
+        reference_summary_sentences = document.referenceSummary
+        print("tf", summary_sentences)
 
-# test_doc = Document(1, 'bussines', 'some text', 'referenceSummary', 'summary')
+        summary2 = ranking(document, 3, None, order_ranked, corpus_idfs, {"rank_option": "tf-idf", "mmr": False})
+        print("tfidf", summary2)
+
+        summary3 = ranking(document, 3, None, order_ranked, corpus_idfs, {"rank_option": "bm25", "mmr": False})
+        print("bm25",summary3)
+
+        summary4 = ranking(document, 3, None, order_ranked, corpus_idfs, {"rank_option": "rrf", "mmr": False})
+        print("rrf",summary4)
+
+        summary5 = ranking(document, 3, None, order_ranked, corpus_idfs, {"rank_option": "tf-idf", "mmr": True})
+        print("mmr",summary5)
+
 evaluation(documents)

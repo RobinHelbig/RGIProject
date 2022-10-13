@@ -7,31 +7,14 @@ from src.helper.textProcessingHelper import getSentences, getTerms
 from src.mainFunctions.indexing import indexing
 
 
-def get_tfs(sentence_terms: [str], inverted_index: {str: IndexEntry}) -> float:
-    tf_score: float = 0.0
-
-    for term in sentence_terms:
-        i = inverted_index[term]
-
-        tf = i.document_frequency
-        if tf != 0:
-            tf = 1 + log10(tf)
-
-        tf_score += tf
-
-    return tf_score
-
-
-def get_tfidfs(terms: [str], sentence_index: int, inverted_index: {str: IndexEntry}, corpus_idfs: {str: float}) -> {
-    str: float}:
-    tfidfs: {str: float} = {}
+def get_tf_or_tfidf_scores(terms: [str], sentence_index: int, inverted_index: {str: IndexEntry}, corpus_idfs: {str: float}):
+    scores: {str: float} = {}
 
     for term_index, term in enumerate(terms, start=0):
-        if term in tfidfs:
+        if term in scores:
             continue
 
         i = inverted_index[term]
-        idf = corpus_idfs[term]
 
         if sentence_index != -1:
             inverted_index_entry = list(filter(lambda o: o.document_id == sentence_index, i.occurrences))
@@ -45,18 +28,29 @@ def get_tfidfs(terms: [str], sentence_index: int, inverted_index: {str: IndexEnt
         if tf != 0:
             tf = 1 + log10(tf)
 
-        tfidfs.update({term: tf * idf})
+        score = tf
+        if corpus_idfs:  # if inverted document frequencies of the terms in the corpus are passed, calculcate tfidf
+            score = score * corpus_idfs[term]
+        scores.update({term: score})
 
     length = 0.0
-    for term in tfidfs:
-        length += pow(tfidfs[term], 2)
+    for term in scores:
+        length += pow(scores[term], 2)
 
     length = pow(length, 0.5)
 
-    for term in tfidfs:
-        tfidfs.update({term: tfidfs[term] / length})
+    for term in scores:
+        scores.update({term: scores[term] / length})
 
-    return tfidfs
+    return scores
+
+
+def get_tfs(terms: [str], sentence_index: int, inverted_index: {str: IndexEntry}) -> {str: float}:
+    return get_tf_or_tfidf_scores(terms, sentence_index, inverted_index, None)
+
+
+def get_tfidfs(terms: [str], sentence_index: int, inverted_index: {str: IndexEntry}, corpus_idfs: {str: float}) -> {str: float}:
+    return get_tf_or_tfidf_scores(terms, sentence_index, inverted_index, corpus_idfs)
 
 
 def get_BM25(document_terms: [str], sentence_index: int, sentence_length: float, avg_sentence_length: float,
@@ -85,24 +79,29 @@ def get_BM25(document_terms: [str], sentence_index: int, sentence_length: float,
 def mmr_next_sentence(current_document: list[(int, list[str])], current_summary: list[(int, list[str])],
                       corpus_idfs: {str: float}) -> (int, [str]):
     lam = 0.5
-
     document_terms: list[str] = []
-    sentence_terms: list[list[str]] = []
+    sentence_terms_current_document: list[list[str]] = []
     for sentence in current_document:
-        sentence_terms.append(sentence[1])
+        sentence_terms_current_document.append(sentence[1])
         document_terms += sentence[1]
 
-    inverted_index = indexing(sentence_terms)
-    document_tfidfs = get_tfidfs(document_terms, -1, inverted_index, corpus_idfs)
+    sentence_terms_current_summary: list[list[str]] = []
+    for sentence in current_summary:
+        sentence_terms_current_summary.append(sentence[1])
+
+    inverted_index_current_document = indexing(sentence_terms_current_document)
+    inverted_index_current_summary = indexing(sentence_terms_current_summary)
+
+    document_tfidfs = get_tfidfs(document_terms, -1, inverted_index_current_document, corpus_idfs)
     current_summary_tfidfs: list[{str: float}] = list()
 
     for sentence in current_summary:
-        tfidfs = get_tfidfs(sentence[1], sentence[0], inverted_index, corpus_idfs)
+        tfidfs = get_tfidfs(sentence[1], sentence[0], inverted_index_current_summary, corpus_idfs)
         current_summary_tfidfs.append(tfidfs)
 
     sentence_scores = list[(int, int)]()
     for sentence in current_document:
-        tfidfs = get_tfidfs(sentence[1], sentence[0], inverted_index, corpus_idfs)
+        tfidfs = get_tfidfs(sentence[1], sentence[0], inverted_index_current_document, corpus_idfs)
 
         sim_sentence_document = 0.0
         for term in tfidfs:
@@ -122,14 +121,15 @@ def mmr_next_sentence(current_document: list[(int, list[str])], current_summary:
 
     best_sentence = sorted(sentence_scores, key=lambda x: x[1], reverse=True)[0]
     best_sentence_index = best_sentence[0]
-    best_sentence_terms = current_document[best_sentence_index][1]
+    best_sentence = list(filter(lambda d: d[0] == best_sentence_index, current_document))[0]
 
-    return best_sentence_index, best_sentence_terms
+    return best_sentence
 
 
 def rank_sentences(document: Document, corpus_idfs: {str: float}, rank_option: str) -> list[(int, str, int)]:
     sentence_terms = document.text_sentence_terms  # sentence terms including bigrams, noun phrases, ...
     inverted_index = indexing(sentence_terms)
+    document_tfs = get_tfs(document.text_terms, -1, inverted_index)
     document_tfidfs = get_tfidfs(document.text_terms, -1, inverted_index, corpus_idfs)
 
     sim_scores: list[(int, str, int)] = list()
@@ -140,30 +140,38 @@ def rank_sentences(document: Document, corpus_idfs: {str: float}, rank_option: s
         tfidf_score = 0.0
         bm25_score = 0.0
 
-        if rank_option == "tf":  # should be a very bad option because for long sentences the tf_score will be higher for the document
-            tf_score = get_tfs(sentence_terms, inverted_index)
-            sim_scores.append((sentence_terms_index, sentence, tf_score))
+        if rank_option == "tf" or rank_option == "rrf":  # normalized over sentence length
+            tfs = get_tfs(sentence_terms, sentence_terms_index, inverted_index)
+            for term in tfs:
+                score = tfs[term]
+                doc_score = document_tfs[term]
+                tf_score += score * doc_score
+
+            if rank_option == "tf":
+                sim_scores.append((sentence_terms_index, sentence, tf_score))
 
         if rank_option == "tf-idf" or rank_option == "rrf":  # normalized over sentence length
             tfidfs = get_tfidfs(sentence_terms, sentence_terms_index, inverted_index, corpus_idfs)
             for term in tfidfs:
                 score = tfidfs[term]
-                doc_score = document_tfidfs[term]  # if the word is in the sentence, it will be in the doc too
+                doc_score = document_tfidfs[term]
                 tfidf_score += score * doc_score
 
-            sim_scores.append((sentence_terms_index, sentence, tfidf_score))
+            if rank_option == "tf-idf":
+                sim_scores.append((sentence_terms_index, sentence, tfidf_score))
 
         if rank_option == "bm25" or rank_option == "rrf":  # normalized over sentence length
             bm25_score = get_BM25(document.text_terms, sentence_terms_index, len(sentence),
                                   document.text_sentences_avg_length, inverted_index, corpus_idfs)
 
-            sim_scores.append((sentence_terms_index, sentence, bm25_score))
+            if rank_option == "bm25":
+                sim_scores.append((sentence_terms_index, sentence, bm25_score))
         if rank_option == "rrf":
             my = 5
-            rrf_score = (1 / (my + tf_score)) + (
-                        1 / (my + bm25_score))  # tf_score is not taken into consideration because it is not normalized
+            rrf_score = (1 / (my + tf_score)) + (1 / (my + tfidf_score)) + (1 / (my + bm25_score))
             sim_scores.append((sentence_terms_index, sentence, rrf_score))
 
+    # print("ran", rank_option, sim_scores)
     return sim_scores
 
 
@@ -177,7 +185,10 @@ def ranking(document: Document, max_sentences: int, max_chars: int, order_ranked
 
     if mmr is False:
         ranked_sentences = sorted(rank_sentences(document, corpus_idfs, rank_option), key=lambda x: x[2], reverse=True)
+
         while True:
+            if len(ranked_sentences) == 0:
+                break
             if len(summary) == max_sentences:
                 break
 
@@ -212,6 +223,8 @@ def ranking(document: Document, max_sentences: int, max_chars: int, order_ranked
             current_document_terms.append((sentence_terms_index, sentence_terms))
 
         while True:
+            if len(current_document_terms) == 0:
+                break
             if len(summary) == max_sentences:
                 break
 
@@ -225,6 +238,7 @@ def ranking(document: Document, max_sentences: int, max_chars: int, order_ranked
                     break
 
             current_summary_terms.append((next_sentence_index, next_sentence_terms))
+            current_document_terms.remove((next_sentence_index, next_sentence_terms))
 
             if order_ranked:
                 summary.append((next_sentence_index, next_sentence_text))
