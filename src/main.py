@@ -8,14 +8,13 @@
 # nltk.download('wordnet')
 # nltk.download('omw-1.4')
 
-from src.mainFunctions.evaluation import calcualte_true_pos_final
-from src.mainFunctions.evaluation import calculate_precision_recall_final
+from src.mainFunctions.evaluation import calculate_true_pos
+from src.mainFunctions.evaluation import calculate_precision_recall
 from src.mainFunctions.evaluation import calculate_fbeta_measure
-from src.mainFunctions.evaluation import calculate_precision_recall_tables_and_MAP_param_final
-from src.mainFunctions.evaluation import draw_precision_recall_curve_final
-from src.mainFunctions.evaluation import draw_MAP_chart_final
-
-from src.mainFunctions.evaluation import get_MAP_avg_by_cat_and_standard_deviation_final
+from src.mainFunctions.evaluation import calculate_precision_recall_tables_and_MAP_param
+from src.mainFunctions.evaluation import draw_precision_recall_curve
+from src.mainFunctions.evaluation import draw_MAP_chart
+from src.mainFunctions.evaluation import get_MAP_avg_by_cat_and_standard_deviation
 
 from operator import attrgetter
 from turtle import title
@@ -48,34 +47,31 @@ def evaluation(documents: List[Document]):
     tech = []
 
     for document in documents:
-        true_pos = calcualte_true_pos_final(document)
-        precision_recall_tuple = calculate_precision_recall_final(document.referenceSummary, document.summary, true_pos)
-        #warunek 0
-        #calculate_fbeta_measure(precision_recall_tuple[0], precision_recall_tuple[1])
-        precision_recall_tuple = calculate_precision_recall_tables_and_MAP_param_final(document.referenceSummary,
+        true_pos = calculate_true_pos(document)
+        precision_recall_tuple = calculate_precision_recall(document.referenceSummary, document.summary, true_pos)
+        calculate_fbeta_measure(precision_recall_tuple[0], precision_recall_tuple[1])
+        precision_recall_tuple = calculate_precision_recall_tables_and_MAP_param(document.referenceSummary,
                                                                                        true_pos)
-        # it will draw chart for every document
-        # draw_precision_recall_curve_final(precision_recall_tuple)
+        # it will draw chart for every document, so I added condition
+        if document.id == 1:
+            draw_precision_recall_curve(precision_recall_tuple)
 
-        # get_all_category_docs from reference dir and from 'our' dir ???
-
-    #get_MAP_avg_by_cat_and_standard_deviation('../BBC News Summary/Summaries/business', '../BBC News Summary/Test Summaries/business/')
     business_docs = list(filter(lambda d: d.category == "business", documents))
-    business = get_MAP_avg_by_cat_and_standard_deviation_final(business_docs)
+    business = get_MAP_avg_by_cat_and_standard_deviation(business_docs)
 
     entertainment_docs = list(filter(lambda d: d.category == "entertainment", documents))
-    entertainment = get_MAP_avg_by_cat_and_standard_deviation_final(entertainment_docs)
+    entertainment = get_MAP_avg_by_cat_and_standard_deviation(entertainment_docs)
 
     politics_docs = list(filter(lambda d: d.category == "politics", documents))
-    politics = get_MAP_avg_by_cat_and_standard_deviation_final(politics_docs)
+    politics = get_MAP_avg_by_cat_and_standard_deviation(politics_docs)
 
     sport_docs = list(filter(lambda d: d.category == "sport", documents))
-    sport = get_MAP_avg_by_cat_and_standard_deviation_final(sport_docs)
+    sport = get_MAP_avg_by_cat_and_standard_deviation(sport_docs)
 
     tech_docs = list(filter(lambda d: d.category == "tech", documents))
-    tech = get_MAP_avg_by_cat_and_standard_deviation_final(tech_docs)
+    tech = get_MAP_avg_by_cat_and_standard_deviation(tech_docs)
 
-    draw_MAP_chart_final(business, entertainment, politics, sport, tech)
+    draw_MAP_chart(business, entertainment, politics, sport, tech)
 
 
 print("Start")
