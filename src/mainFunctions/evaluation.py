@@ -1,108 +1,21 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from src.helper import helper
-from src.data.document import Document
 import math
-
-import os
 
 BETA = 0.5
 CATEGORIES = ['business', 'entertainment', 'politics', 'sport', 'tech']
 
-
-# helper
-def get_all_category_docs(directory):
-    category_list = []
-
-    for filename in os.listdir(directory):
-        f = os.path.join(directory, filename)
-        if os.path.isfile(f):
-            category_list.append(f)
-
-    return category_list
-
-
-def get_MAP_avg_by_cat_and_standard_deviation(reference_dir, dir):
-    # business
-
-    reference_category = get_all_category_docs(reference_dir)
-    category = get_all_category_docs(dir)
-
+def calculate_true_pos(document):
     true_pos = []
-
-    for i in range(len(reference_category)):
-        for j in range(len(category)):
-            if i == j:
-                true_pos.append(calcualte_true_pos_cat(reference_category[i], category[j]))
-
-    reference_MAP = []
-    score_deviation_from_mean = []
-
-    for i in range(len(reference_category)):
-        reference_MAP.append(
-            calculate_precision_recall_tables_and_MAP_param_cat(reference_category[i], true_pos[i])[2])
-
-    reference_MAP_avg = sum(reference_MAP) / len(true_pos)
-
-    for i in range(len(reference_MAP)):
-        score_deviation_from_mean.append(pow(reference_MAP[i] - reference_MAP_avg, 2))
-
-    business_standard_deviation = sum(score_deviation_from_mean) / len(reference_MAP)
-
-    return reference_MAP_avg, business_standard_deviation
-
-
-def draw_MAP_chart():
-    reference_business_dir = '../BBC News Summary/Summaries/business'
-    business_dir = '../BBC News Summary/Test Summaries/business/'
-    reference_entertainment_dir = '../BBC News Summary/Summaries/entertainment'
-    entertainment_dir = '../BBC News Summary/Test Summaries/entertainment/'
-    reference_politics_dir = '../BBC News Summary/Summaries/politics'
-    politics_dir = '../BBC News Summary/Test Summaries/politics/'
-    reference_sport_dir = '../BBC News Summary/Summaries/sport'
-    sport_dir = '../BBC News Summary/Test Summaries/sport/'
-    reference_tech_dir = '../BBC News Summary/Summaries/tech'
-    tech_dir = '../BBC News Summary/Test Summaries/tech/'
-
-    business_category = get_MAP_avg_by_cat_and_standard_deviation(reference_business_dir, business_dir)
-    entertainment_category = get_MAP_avg_by_cat_and_standard_deviation(reference_entertainment_dir, entertainment_dir)
-    politics_category = get_MAP_avg_by_cat_and_standard_deviation(reference_politics_dir, politics_dir)
-    sport_category = get_MAP_avg_by_cat_and_standard_deviation(reference_sport_dir, sport_dir)
-    tech_category = get_MAP_avg_by_cat_and_standard_deviation(reference_tech_dir, tech_dir)
-
-    fig, ax = plt.subplots()
-
-    ax.bar(x=CATEGORIES,
-           height=[business_category[0], entertainment_category[0], politics_category[0], sport_category[0], tech_category[0]],
-           yerr=[business_category[1], entertainment_category[1], politics_category[1], sport_category[1], tech_category[1]],
-           capsize=4)
-
-    plt.title('MAP - comparision')
-    plt.xlabel('Category')
-    plt.ylabel('MAP value')
-    plt.show()
-
-
-def calcualte_true_pos(documents):
-    reference_summary_path = '../BBC News Summary/Summaries/business/001.txt'
-    reference_summary = helper.extract_sentences(reference_summary_path)
-    summary_path = '../BBC News Summary/Test Summaries/business/001.txt'
-    summary = helper.extract_sentences(summary_path)
-    true_pos = []
-    for t1 in reference_summary:
-        for t2 in summary:
+    for t1 in document.referenceSummary:
+        for t2 in document.summary:
             # remove not same
             if t1 == t2:
                 true_pos.append(t2)
     return true_pos
 
 
-def calculate_precision_recall(documents, true_pos):
-    reference_summary_path = '../BBC News Summary/Summaries/business/001.txt'
-    reference_summary = helper.extract_sentences(reference_summary_path)
-    summary_path = '../BBC News Summary/Test Summaries/business/001.txt'
-    summary = helper.extract_sentences(summary_path)
-
+def calculate_precision_recall(reference_summary, summary, true_pos):
     TP = len(true_pos)
     FP = len(summary) - TP
     FN = len(reference_summary) - TP
@@ -120,86 +33,41 @@ def calculate_precision_recall(documents, true_pos):
     return precision, recall
 
 
-def calculate_precision_recall_tables_and_MAP_param(documents, true_pos):
-    reference_summary_path = '../BBC News Summary/Summaries/business/001.txt'
-    reference_summary = helper.extract_sentences(reference_summary_path)
-    summary_path = '../BBC News Summary/Test Summaries/business/001.txt'
-    summary = helper.extract_sentences(summary_path)
-
-    recall_table = [0.0]
-    true_pos_counter = 0
-    recall_denominator = len(reference_summary)
-    map_precision = []
-
-    precision_table = [0.0]
-    precision_denominator = 0
-
-    for t in reference_summary:
-        incremented = False
-        if t in true_pos:
-            true_pos_counter = true_pos_counter + 1
-            incremented = True
-        recall_table.append(true_pos_counter / recall_denominator)
-        precision_denominator = precision_denominator + 1
-        precision_table.append(true_pos_counter / precision_denominator)
-        if incremented:
-            map_precision.append(true_pos_counter / precision_denominator)
-
-    MAP = sum(map_precision) / len(reference_summary)
-
-    return recall_table, precision_table, MAP
-
-
-def calcualte_true_pos_cat(reference_summary_path, summary_path):
-    reference_summary = helper.extract_sentences(reference_summary_path)
-    summary = helper.extract_sentences(summary_path)
-    true_pos = []
-
-    for t1 in reference_summary:
-        for t2 in summary:
-            # remove not same
-            if t1 == t2:
-                true_pos.append(t2)
-    return true_pos
-
-
-def calculate_precision_recall_tables_and_MAP_param_cat(reference_summary_path, true_pos):
-    # reference_summary_path = '../BBC News Summary/Summaries/business/001.txt'
-    reference_summary = helper.extract_sentences(reference_summary_path)
-    recall_table = [0.0]
-    true_pos_counter = 0
-    recall_denominator = len(reference_summary)
-    map_precision = []
-
-    precision_table = [0.0]
-    precision_denominator = 0
-
-    for t in reference_summary:
-        incremented = False
-        if t in true_pos:
-            true_pos_counter = true_pos_counter + 1
-            incremented = True
-        recall_table.append(true_pos_counter / recall_denominator)
-        precision_denominator = precision_denominator + 1
-        precision_table.append(true_pos_counter / precision_denominator)
-        if incremented:
-            map_precision.append(true_pos_counter / precision_denominator)
-
-    MAP = sum(map_precision) / len(reference_summary)
-
-    return recall_table, precision_table, MAP
-
-
 def calculate_fbeta_measure(precision, recall):
-    Fbeta = ((1 + math.pow(BETA, 2)) * precision * recall) / (math.pow(BETA, 2) * precision + recall)
+    if (math.pow(BETA, 2) * precision + recall) == 0:
+        Fbeta = 0
+    else:
+        Fbeta = ((1 + math.pow(BETA, 2)) * precision * recall) / (math.pow(BETA, 2) * precision + recall)
     print("Fbeta: " + str(Fbeta))
     return Fbeta
 
 
-def draw_precision_recall_curve():
-    test_doc = Document(1, 'bussines', 'some text', 'referenceSummary', 'summary')
-    true_pos = calcualte_true_pos(test_doc)
-    precision_recall_tuple = calculate_precision_recall_tables_and_MAP_param(test_doc, true_pos)
+def calculate_precision_recall_tables_and_MAP_param(reference_summary, true_pos):
+    recall_table = [0.0]
+    true_pos_counter = 0
+    recall_denominator = len(reference_summary)
+    map_precision = []
+
+    precision_table = [0.0]
+    precision_denominator = 0
+
+    for t in reference_summary:
+        incremented = False
+        if t in true_pos:
+            true_pos_counter = true_pos_counter + 1
+            incremented = True
+        recall_table.append(true_pos_counter / recall_denominator)
+        precision_denominator = precision_denominator + 1
+        precision_table.append(true_pos_counter / precision_denominator)
+        if incremented:
+            map_precision.append(true_pos_counter / precision_denominator)
+
+    MAP = sum(map_precision) / len(reference_summary)
+
+    return recall_table, precision_table, MAP
+
+
+def draw_precision_recall_curve(precision_recall_tuple):
     plt.rcParams["figure.figsize"] = [7.50, 3.50]
     plt.rcParams["figure.autolayout"] = True
 
@@ -228,4 +96,48 @@ def draw_precision_recall_curve():
     plt.title('Precision-recall curve')
     plt.xlabel('recall')
     plt.ylabel('precision')
+    plt.show()
+
+
+def get_MAP_avg_by_cat_and_standard_deviation(category_doc):
+    reference_MAP = []
+    score_deviation_from_mean = []
+    true_pos_list = []
+
+    for d in category_doc:
+        true_pos = calculate_true_pos(d)
+        true_pos_list.append(true_pos)
+        reference_MAP.append(
+            calculate_precision_recall_tables_and_MAP_param(d.referenceSummary, true_pos)[2])
+
+    if len(true_pos_list) == 0:
+        reference_MAP_avg = 0
+    else:
+        reference_MAP_avg = sum(reference_MAP) / len(true_pos_list)
+
+    for i in range(len(reference_MAP)):
+        score_deviation_from_mean.append(pow(reference_MAP[i] - reference_MAP_avg, 2))
+
+    if len(reference_MAP) == 0:
+        standard_deviation = 0
+    else:
+        standard_deviation = sum(score_deviation_from_mean) / len(reference_MAP)
+
+    return reference_MAP_avg, standard_deviation
+
+
+def draw_MAP_chart(business, entertainment, politics, sport, tech):
+
+    fig, ax = plt.subplots()
+
+    ax.bar(x=CATEGORIES,
+           height=[business[0], entertainment[0], politics[0], sport[0],
+                   tech[0]],
+           yerr=[business[1], entertainment[1], politics[1], sport[1],
+                 tech[1]],
+           capsize=4)
+
+    plt.title('MAP - comparision')
+    plt.xlabel('Category')
+    plt.ylabel('MAP value')
     plt.show()

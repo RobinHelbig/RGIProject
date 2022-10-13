@@ -8,14 +8,13 @@
 # nltk.download('wordnet')
 # nltk.download('omw-1.4')
 
-# from src.mainFunctions.evaluation import calcualte_true_pos
+from src.mainFunctions.evaluation import calculate_true_pos
 from src.mainFunctions.evaluation import calculate_precision_recall
 from src.mainFunctions.evaluation import calculate_fbeta_measure
+from src.mainFunctions.evaluation import calculate_precision_recall_tables_and_MAP_param
 from src.mainFunctions.evaluation import draw_precision_recall_curve
-from src.mainFunctions.evaluation import get_MAP_avg_by_cat_and_standard_deviation
 from src.mainFunctions.evaluation import draw_MAP_chart
-
-from data.document import Document
+from src.mainFunctions.evaluation import get_MAP_avg_by_cat_and_standard_deviation
 
 from operator import attrgetter
 from turtle import title
@@ -32,28 +31,58 @@ from src.mainFunctions.ranking import ranking
 
 documents: [Document]
 
-
 """pass every document you want to evaluate (for example just one document or all of a certain category"""
 
 """pass every document you want to evaluate (for example just one document or all of a certain category"""
 
-#def evaluation(documents: [Document]):
+
+# def evaluation(documents: [Document]):
 
 def evaluation(documents: List[Document]):
     print("evaluation")
+    business = []
+    entertainment = []
+    politics = []
+    sport = []
+    tech = []
 
-    # true_pos = calcualte_true_pos(test_doc)
-    # precision_recall_tuple = calculate_precision_recall(test_doc, true_pos)
-    # calculate_fbeta_measure(precision_recall_tuple[0], precision_recall_tuple[1])
-    draw_precision_recall_curve()
+    for document in documents:
+        true_pos = calculate_true_pos(document)
+        precision_recall_tuple = calculate_precision_recall(document.referenceSummary, document.summary, true_pos)
+        calculate_fbeta_measure(precision_recall_tuple[0], precision_recall_tuple[1])
+        precision_recall_tuple = calculate_precision_recall_tables_and_MAP_param(document.referenceSummary,
+                                                                                       true_pos)
+        # it will draw chart for every document, so I added condition
+        if document.id == 1:
+            draw_precision_recall_curve(precision_recall_tuple)
 
-    draw_MAP_chart()
+    business_docs = list(filter(lambda d: d.category == "business", documents))
+    business = get_MAP_avg_by_cat_and_standard_deviation(business_docs)
+
+    entertainment_docs = list(filter(lambda d: d.category == "entertainment", documents))
+    entertainment = get_MAP_avg_by_cat_and_standard_deviation(entertainment_docs)
+
+    politics_docs = list(filter(lambda d: d.category == "politics", documents))
+    politics = get_MAP_avg_by_cat_and_standard_deviation(politics_docs)
+
+    sport_docs = list(filter(lambda d: d.category == "sport", documents))
+    sport = get_MAP_avg_by_cat_and_standard_deviation(sport_docs)
+
+    tech_docs = list(filter(lambda d: d.category == "tech", documents))
+    tech = get_MAP_avg_by_cat_and_standard_deviation(tech_docs)
+
+    draw_MAP_chart(business, entertainment, politics, sport, tech)
 
 
 print("Start")
 # visualize("VisualizeOutput1.txt", mockData(), 1)
 # visualize("VisualizeOutput2.txt", mockData(), 2)
 # visualize("VisualizeOutput3.txt", mockData(), 3)
+
+
+# documents_no_preprocessing = read_files(False)
+# documents_preprocessing = read_files(True)
+#
 
 documents_preprocessing = read_files(True, ["business"])
 print("HI")
@@ -68,6 +97,15 @@ for v in index:
     corpus_idfs[v] = index[v].inverted_document_frequency
 
 for document in documents:
+    document.summary = ranking(document, 7, None, order_ranked, corpus_idfs, {"rank_option": "rrf", "mmr": False})
+#     #print(document.id, document.summary)
+#
+#     document_sentences = document.text_sentences
+#     summary_sentences = document.summary
+#     reference_summary_sentences = document.referenceSummary
+
+# visualize
+# evaluate
     # if "Air Jamaica" in document.text:
         document.summary = ranking(document, 3, None, order_ranked, corpus_idfs, {"rank_option": "tf", "mmr": False})
         # print(document.id, document.summary)
@@ -88,9 +126,5 @@ for document in documents:
 
         summary5 = ranking(document, 3, None, order_ranked, corpus_idfs, {"rank_option": "tf-idf", "mmr": True})
         print("mmr",summary5)
-    # visualize
-    # evaluate
 
-
-# test_doc = Document(1, 'bussines', 'some text', 'referenceSummary', 'summary')
-# evaluation(test_doc)
+evaluation(documents)
