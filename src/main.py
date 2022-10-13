@@ -53,7 +53,7 @@ def evaluation(documents: List[Document]):
         precision_recall_tuple = calculate_precision_recall_tables_and_MAP_param(document.referenceSummary,
                                                                                        true_pos)
         # it will draw chart for every document, so I added condition
-        if document.id == 1:
+        if document.id == 2:
             draw_precision_recall_curve(precision_recall_tuple)
 
     business_docs = list(filter(lambda d: d.category == "business", documents))
