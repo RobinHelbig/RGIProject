@@ -21,7 +21,7 @@ def get_all_category_docs(directory):
         f = os.path.join(directory, filename)
         if os.path.isfile(f):
             category_list.append(f)
-
+    print(category_list)
     return category_list
 
 
@@ -30,6 +30,8 @@ def get_MAP_avg_by_cat_and_standard_deviation(reference_dir, dir):
 
     reference_category = get_all_category_docs(reference_dir)
     category = get_all_category_docs(dir)
+
+    print(reference_category)
 
     true_pos = []
 
@@ -193,6 +195,8 @@ def calculate_precision_recall_tables_and_MAP_param_cat(reference_summary_path, 
     MAP = sum(map_precision) / len(reference_summary)
 
     return recall_table, precision_table, MAP
+
+
 def draw_precision_recall_curve():
     test_doc = Document(1, 'bussines', 'some text', 'referenceSummary', 'summary')
     true_pos = calcualte_true_pos(test_doc)
@@ -227,17 +231,17 @@ def draw_precision_recall_curve():
     plt.ylabel('precision')
     plt.show()
 
-#final
-def calcualte_true_pos_final(documents: List[Document]):
+
+# final
+def calcualte_true_pos_final(document):
     # reference_summary = helper.extract_sentences(reference_summary_path)
     # summary = helper.extract_sentences(summary_path)
     true_pos = []
-    for document in documents:
-        for t1 in document.referenceSummary:
-            for t2 in document.summary:
-                # remove not same
-                if t1 == t2:
-                    true_pos.append(t2)
+    for t1 in document.referenceSummary:
+        for t2 in document.summary:
+            # remove not same
+            if t1 == t2:
+                true_pos.append(t2)
     return true_pos
 
 
@@ -296,6 +300,7 @@ def calculate_precision_recall_tables_and_MAP_param_final(reference_summary, tru
 
     return recall_table, precision_table, MAP
 
+
 def draw_precision_recall_curve_final(precision_recall_tuple):
     # test_doc = Document(1, 'bussines', 'some text', 'referenceSummary', 'summary')
     # true_pos = calcualte_true_pos(test_doc)
@@ -330,31 +335,46 @@ def draw_precision_recall_curve_final(precision_recall_tuple):
     plt.ylabel('precision')
     plt.show()
 
-def get_MAP_avg_by_cat_and_standard_deviation_final(reference_dir, dir):
-    # business
 
-    reference_category = get_all_category_docs(reference_dir)
-    category = get_all_category_docs(dir)
-
-    true_pos = []
-
-    for i in range(len(reference_category)):
-        for j in range(len(category)):
-            if i == j:
-                true_pos.append(calcualte_true_pos_cat(reference_category[i], category[j]))
-
+def get_MAP_avg_by_cat_and_standard_deviation_final(category_doc):
     reference_MAP = []
     score_deviation_from_mean = []
+    true_pos_list = []
 
-    for i in range(len(reference_category)):
+    for d in category_doc:
+        true_pos = calcualte_true_pos_final(d)
+        true_pos_list.append(true_pos)
         reference_MAP.append(
-            calculate_precision_recall_tables_and_MAP_param_cat(reference_category[i], true_pos[i])[2])
+            calculate_precision_recall_tables_and_MAP_param_final(d.referenceSummary, true_pos)[2])
 
-    reference_MAP_avg = sum(reference_MAP) / len(true_pos)
+    if len(true_pos_list) == 0:
+        reference_MAP_avg = 0
+    else:
+        reference_MAP_avg = sum(reference_MAP) / len(true_pos_list)
 
     for i in range(len(reference_MAP)):
         score_deviation_from_mean.append(pow(reference_MAP[i] - reference_MAP_avg, 2))
 
-    business_standard_deviation = sum(score_deviation_from_mean) / len(reference_MAP)
+    if len(reference_MAP) == 0:
+        standard_deviation = 0
+    else:
+        standard_deviation = sum(score_deviation_from_mean) / len(reference_MAP)
 
-    return reference_MAP_avg, business_standard_deviation
+    return reference_MAP_avg, standard_deviation
+
+
+def draw_MAP_chart_final(business, entertainment, politics, sport, tech):
+
+    fig, ax = plt.subplots()
+
+    ax.bar(x=CATEGORIES,
+           height=[business[0], entertainment[0], politics[0], sport[0],
+                   tech[0]],
+           yerr=[business[1], entertainment[1], politics[1], sport[1],
+                 tech[1]],
+           capsize=4)
+
+    plt.title('MAP - comparision')
+    plt.xlabel('Category')
+    plt.ylabel('MAP value')
+    plt.show()

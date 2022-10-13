@@ -13,6 +13,9 @@ from src.mainFunctions.evaluation import calculate_precision_recall_final
 from src.mainFunctions.evaluation import calculate_fbeta_measure
 from src.mainFunctions.evaluation import calculate_precision_recall_tables_and_MAP_param_final
 from src.mainFunctions.evaluation import draw_precision_recall_curve_final
+from src.mainFunctions.evaluation import draw_MAP_chart_final
+
+from src.mainFunctions.evaluation import get_MAP_avg_by_cat_and_standard_deviation_final
 
 from operator import attrgetter
 from turtle import title
@@ -43,10 +46,12 @@ def evaluation(documents: List[Document]):
     politics = []
     sport = []
     tech = []
+
     for document in documents:
-        true_pos = calcualte_true_pos_final(documents)
+        true_pos = calcualte_true_pos_final(document)
         precision_recall_tuple = calculate_precision_recall_final(document.referenceSummary, document.summary, true_pos)
-        calculate_fbeta_measure(precision_recall_tuple[0], precision_recall_tuple[1])
+        #warunek 0
+        #calculate_fbeta_measure(precision_recall_tuple[0], precision_recall_tuple[1])
         precision_recall_tuple = calculate_precision_recall_tables_and_MAP_param_final(document.referenceSummary,
                                                                                        true_pos)
         # it will draw chart for every document
@@ -54,14 +59,23 @@ def evaluation(documents: List[Document]):
 
         # get_all_category_docs from reference dir and from 'our' dir ???
 
+    #get_MAP_avg_by_cat_and_standard_deviation('../BBC News Summary/Summaries/business', '../BBC News Summary/Test Summaries/business/')
+    business_docs = list(filter(lambda d: d.category == "business", documents))
+    business = get_MAP_avg_by_cat_and_standard_deviation_final(business_docs)
 
+    entertainment_docs = list(filter(lambda d: d.category == "entertainment", documents))
+    entertainment = get_MAP_avg_by_cat_and_standard_deviation_final(entertainment_docs)
 
-    # true_pos = calcualte_true_pos(test_doc)
-    # precision_recall_tuple = calculate_precision_recall(test_doc, true_pos)
-    # calculate_fbeta_measure(precision_recall_tuple[0], precision_recall_tuple[1])
-    # draw_precision_recall_curve()
+    politics_docs = list(filter(lambda d: d.category == "politics", documents))
+    politics = get_MAP_avg_by_cat_and_standard_deviation_final(politics_docs)
 
-    # draw_MAP_chart()
+    sport_docs = list(filter(lambda d: d.category == "sport", documents))
+    sport = get_MAP_avg_by_cat_and_standard_deviation_final(sport_docs)
+
+    tech_docs = list(filter(lambda d: d.category == "tech", documents))
+    tech = get_MAP_avg_by_cat_and_standard_deviation_final(tech_docs)
+
+    draw_MAP_chart_final(business, entertainment, politics, sport, tech)
 
 
 print("Start")
