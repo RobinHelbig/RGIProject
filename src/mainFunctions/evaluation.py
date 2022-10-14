@@ -5,6 +5,7 @@ import math
 BETA = 0.5
 CATEGORIES = ['business', 'entertainment', 'politics', 'sport', 'tech']
 
+
 def calculate_true_pos(document):
     true_pos = []
     for t1 in document.referenceSummary:
@@ -42,16 +43,16 @@ def calculate_fbeta_measure(precision, recall):
     return Fbeta
 
 
-def calculate_precision_recall_tables_and_MAP_param(reference_summary, true_pos):
+def calculate_precision_recall_tables_and_MAP_param(summary, true_pos):
     recall_table = [0.0]
     true_pos_counter = 0
-    recall_denominator = len(reference_summary)
+    recall_denominator = len(true_pos)
     map_precision = []
 
     precision_table = [0.0]
     precision_denominator = 0
 
-    for t in reference_summary:
+    for t in summary:
         incremented = False
         if t in true_pos:
             true_pos_counter = true_pos_counter + 1
@@ -62,7 +63,7 @@ def calculate_precision_recall_tables_and_MAP_param(reference_summary, true_pos)
         if incremented:
             map_precision.append(true_pos_counter / precision_denominator)
 
-    MAP = sum(map_precision) / len(reference_summary)
+    MAP = sum(map_precision) / len(map_precision)
 
     return recall_table, precision_table, MAP
 
@@ -102,18 +103,12 @@ def draw_precision_recall_curve(precision_recall_tuple):
 def get_MAP_avg_by_cat_and_standard_deviation(category_doc):
     reference_MAP = []
     score_deviation_from_mean = []
-    true_pos_list = []
 
     for d in category_doc:
         true_pos = calculate_true_pos(d)
-        true_pos_list.append(true_pos)
-        reference_MAP.append(
-            calculate_precision_recall_tables_and_MAP_param(d.referenceSummary, true_pos)[2])
+        reference_MAP.append(calculate_precision_recall_tables_and_MAP_param(d.summary, true_pos)[2])
 
-    if len(true_pos_list) == 0:
-        reference_MAP_avg = 0
-    else:
-        reference_MAP_avg = sum(reference_MAP) / len(true_pos_list)
+    reference_MAP_avg = sum(reference_MAP) / len(reference_MAP)
 
     for i in range(len(reference_MAP)):
         score_deviation_from_mean.append(pow(reference_MAP[i] - reference_MAP_avg, 2))
@@ -121,7 +116,7 @@ def get_MAP_avg_by_cat_and_standard_deviation(category_doc):
     if len(reference_MAP) == 0:
         standard_deviation = 0
     else:
-        standard_deviation = sum(score_deviation_from_mean) / len(reference_MAP)
+        standard_deviation = pow(sum(score_deviation_from_mean) / len(reference_MAP), 0.5)
 
     return reference_MAP_avg, standard_deviation
 
