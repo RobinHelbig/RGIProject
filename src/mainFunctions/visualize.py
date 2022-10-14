@@ -1,6 +1,3 @@
-from mainFunctions.evaluation import draw_precision_recall_curve
-
-from data.document import Document
 from turtle import title
 from typing import List, Dict
 
@@ -70,10 +67,6 @@ def run_visualize(name: str, ranking: Dict[str, int], option: int):
         file_html.write('''</p> 
     </body>
     </html>''')
-        
-
-def visualize(documents: List[Document]):
-    print("visualize")
 
 def write_just_strong(sentence: str, file_html):
     file_html.write("<strong>" + sentence + "</strong>")

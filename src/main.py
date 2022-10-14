@@ -78,14 +78,14 @@ print("Start")
 
 order_ranked = True
 text_processing = True
-documents = read_files(text_processing)
+documents = read_files(text_processing, ["business"])
 index = indexing(list(map(attrgetter('text_terms'), documents)))
 corpus_idfs: {str: float} = {}
 for v in index:
     corpus_idfs[v] = index[v].inverted_document_frequency
 
 for document in documents:
-    document.summary = ranking(document, 7, None, order_ranked, corpus_idfs, {"rank_option": "rrf", "mmr": False})
+    document.summary = ranking(document, 8, 1010, order_ranked, corpus_idfs, {"rank_option": "rrf", "mmr": False})
 #     #print(document.id, document.summary)
 #
 #     document_sentences = document.text_sentences
