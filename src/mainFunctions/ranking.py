@@ -10,7 +10,7 @@ from src.mainFunctions.indexing import indexing
 def get_tf_or_tfidf_scores(terms: [str], inverted_index_pos: int, inverted_index: {str: IndexEntry}, corpus_idfs: {str: float}):
     scores: {str: float} = {}
 
-    for term_index, term in enumerate(terms, start=0):
+    for term in terms:
         if term in scores:
             continue
 
@@ -22,8 +22,10 @@ def get_tf_or_tfidf_scores(terms: [str], inverted_index_pos: int, inverted_index
                 continue
 
             tf = inverted_index_entry[0].frequency
-        else:
-            tf = i.document_frequency
+        else:  # -1 -> get tf/tfidf for whole document
+            tf = 0.0
+            for inverted_index_entry in i.occurrences:
+                tf += inverted_index_entry.frequency
 
         if tf != 0:
             tf = 1 + log10(tf)
@@ -39,8 +41,9 @@ def get_tf_or_tfidf_scores(terms: [str], inverted_index_pos: int, inverted_index
 
     length = pow(length, 0.5)
 
-    for term in scores:
-        scores.update({term: scores[term] / length})
+    if length != 0:
+        for term in scores:
+            scores.update({term: scores[term] / length})
 
     return scores
 
@@ -59,7 +62,7 @@ def get_BM25(document_terms: [str], inverted_index_pos: int, sentence_length: fl
     k = 1.2
     b = 0.75
 
-    for document_term_index, document_term in enumerate(document_terms, start=0):
+    for document_term in document_terms:
         i = inverted_index[document_term]
         idf = corpus_idfs[document_term]
 
@@ -106,15 +109,15 @@ def mmr_next_sentence(current_document: list[(int, list[str])], current_summary:
         sim_sentence_document = 0.0
         for term in tfidfs:
             score = tfidfs[term]
-            doc_score = document_tfidfs[term] if term in document_tfidfs else 0.0
-            sim_sentence_document += score * doc_score
+            doc_score = document_tfidfs[term]
+            sim_sentence_document += (score * doc_score)
 
         sum_sim_sentence_summary = 0.0
         for summary_sentence_tfidfs in current_summary_tfidfs:
             for term in tfidfs:
                 score = tfidfs[term]
                 summary_sentence_score = summary_sentence_tfidfs[term] if term in summary_sentence_tfidfs else 0.0
-                sum_sim_sentence_summary += score * summary_sentence_score
+                sum_sim_sentence_summary += (score * summary_sentence_score)
 
         mmr = (1 - lam) * sim_sentence_document - lam * sum_sim_sentence_summary
         sentence_scores.append((sentence[0], mmr))  # sentence_index, terms
@@ -144,7 +147,7 @@ def rank_sentences(document: Document, corpus_idfs: {str: float}, rank_option: s
                 for term in tfs:
                     score = tfs[term]
                     doc_score = document_tfs[term]
-                    tf_score += score * doc_score
+                    tf_score += (score * doc_score)
 
                 sim_scores.append((sentence_terms_index, sentence, tf_score))
 
@@ -154,7 +157,7 @@ def rank_sentences(document: Document, corpus_idfs: {str: float}, rank_option: s
                 for term in tfidfs:
                     score = tfidfs[term]
                     doc_score = document_tfidfs[term]
-                    tfidf_score += score * doc_score
+                    tfidf_score += (score * doc_score)
 
                 sim_scores.append((sentence_terms_index, sentence, tfidf_score))
 

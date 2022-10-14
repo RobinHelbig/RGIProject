@@ -38,13 +38,6 @@ documents: [Document]
 # def evaluation(documents: [Document]):
 
 def evaluation(documents: List[Document]):
-    print("evaluation")
-    business = []
-    entertainment = []
-    politics = []
-    sport = []
-    tech = []
-
     for document in documents:
         true_pos = calculate_true_pos(document)
         precision_recall_tuple = calculate_precision_recall(document.referenceSummary, document.summary, true_pos)
@@ -101,12 +94,11 @@ for v in corpus_index:
 
 document = documents[32]
 
-# summary_tf = ranking(document, max_sent, max_chars, order_ranked, corpus_idfs, {"rank_option": "tf", "mmr": False})
+summary_tf = ranking(document, max_sent, max_chars, order_ranked, corpus_idfs, {"rank_option": "tf", "mmr": False})
 # summary_tfidf = ranking(document, max_sent, max_chars, order_ranked, corpus_idfs, {"rank_option": "tf-idf", "mmr": False})
 # summary_bm25 = ranking(document, max_sent, max_chars, order_ranked, corpus_idfs, {"rank_option": "bm25", "mmr": False})
 # summary_rrf = ranking(document, max_sent, max_chars, order_ranked, corpus_idfs, {"rank_option": "rrf", "mmr": False})
-summary_mmr = ranking(document, max_sent, max_chars, order_ranked, corpus_idfs, {"rank_option": "tf-idf", "mmr": True})
+# summary_mmr = ranking(document, max_sent, max_chars, order_ranked, corpus_idfs, {"rank_option": "tf-idf", "mmr": True})
 
-print(summary_mmr)
+# print(summary_mmr)
 print("\n")
-print(summary_tfidf)

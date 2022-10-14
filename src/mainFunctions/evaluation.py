@@ -6,6 +6,30 @@ BETA = 0.5
 CATEGORIES = ['business', 'entertainment', 'politics', 'sport', 'tech']
 
 
+def calculate_statistics(documents) -> (int, int, int, int):
+    document_count = len(documents)
+    precision_avg = 0.0
+    recall_avg = 0.0
+    fbeta_avg = 0.0
+    MAP_avg = 0.0
+    for document in documents:
+        TP = calculate_true_pos(document)
+        precision, recall = calculate_precision_recall(document.referenceSummary, document.summary, TP)
+        fbeta = calculate_fbeta_measure(precision, recall)
+        _, _, MAP = calculate_precision_recall_tables_and_MAP_param(document.summary, TP)
+
+        precision_avg += precision
+        recall_avg += recall
+        fbeta_avg += fbeta
+        MAP_avg += MAP
+
+    precision_avg = precision_avg / document_count
+    recall_avg = recall_avg / document_count
+    fbeta_avg = fbeta_avg / document_count
+    MAP_avg = MAP_avg / document_count
+
+    return precision_avg, recall_avg, fbeta_avg, MAP_avg
+
 def calculate_true_pos(document):
     true_pos = []
     for t1 in document.referenceSummary:
@@ -15,21 +39,16 @@ def calculate_true_pos(document):
                 true_pos.append(t2)
     return true_pos
 
-
 def calculate_precision_recall(reference_summary, summary, true_pos):
     TP = len(true_pos)
     FP = len(summary) - TP
     FN = len(reference_summary) - TP
 
-    try:
-        precision = TP / (TP + FP)
-    except:
-        precision = 1
+    if TP == 0:
+        return 0, 0
 
-    try:
-        recall = TP / (TP + FN)
-    except:
-        recall = 1
+    precision = TP / (TP + FP)
+    recall = TP / (TP + FN)
 
     return precision, recall
 
@@ -43,11 +62,13 @@ def calculate_fbeta_measure(precision, recall):
 
 
 def calculate_precision_recall_tables_and_MAP_param(summary, true_pos):
+    if len(true_pos) == 0:
+        return [], [], 0
+
     recall_table = [0.0]
     true_pos_counter = 0
     recall_denominator = len(true_pos)
     map_precision = []
-
     precision_table = [0.0]
     precision_denominator = 0
 

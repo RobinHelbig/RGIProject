@@ -1,3 +1,4 @@
+import re
 import string
 
 import nltk
@@ -17,11 +18,12 @@ def extract_np(psent):
 
 def getTerms(text: str, preprocessing: bool) -> list[str]:
     words = nltk.word_tokenize(text)
-    lemmatizer = nltk.WordNetLemmatizer()
 
     if preprocessing:
+        regexp = re.compile(r'[a-zA-Z0-9]')
+        # print("before", words)
         # remove punctuation
-        words = list(filter(lambda token: token not in string.punctuation, words))
+        words = list(filter(lambda word: regexp.search(word), words))
 
         # noun phrases
         noun_phrases = list()
@@ -36,18 +38,13 @@ def getTerms(text: str, preprocessing: bool) -> list[str]:
             term = " ".join([w for w, t in leaf])
             noun_phrases.append(term)
 
-        # remove stop words
-        # stop_words = set(stopwords.words('english'))
-        # words = [w for w in words if not w.lower() in stop_words]
-
         # bigrams
         bigrams = list(nltk.bigrams(words))
         words += [' '.join(e) for e in bigrams]
 
         words += noun_phrases
 
-        # make words even
+        # make words lower case
         for i in range(len(words)):
             words[i] = words[i].lower()
-            words[i] = lemmatizer.lemmatize(words[i])
     return words

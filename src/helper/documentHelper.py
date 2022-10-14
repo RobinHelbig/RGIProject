@@ -38,7 +38,7 @@ def read_files(prepcrocessing: bool, categories: list[str] = None) -> list[Docum
                     text_sentences_avg_length += len(sentence)
 
                 text_sentences_avg_length = text_sentences_avg_length / len(text_sentences)
-                reference_summary = extract_sentences(open(summary_path, "r", encoding='iso-8859-15').read())
+                reference_summary = extract_sentences(open(summary_path, "r", encoding='iso-8859-15').read(), text)
                 document = Document(doc_id, category, text, text_terms, text_sentences, text_sentences_terms, text_sentences_avg_length, reference_summary, None)
                 documents.append(document)
                 doc_id += 1
