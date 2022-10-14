@@ -50,7 +50,7 @@ def evaluation(documents: List[Document]):
         true_pos = calculate_true_pos(document)
         precision_recall_tuple = calculate_precision_recall(document.referenceSummary, document.summary, true_pos)
         calculate_fbeta_measure(precision_recall_tuple[0], precision_recall_tuple[1])
-        precision_recall_tuple = calculate_precision_recall_tables_and_MAP_param(document.referenceSummary,
+        precision_recall_tuple = calculate_precision_recall_tables_and_MAP_param(document.summary,
                                                                                        true_pos)
         # it will draw chart for every document, so I added condition
         if document.id == 2:
@@ -97,7 +97,7 @@ for v in index:
     corpus_idfs[v] = index[v].inverted_document_frequency
 
 for document in documents:
-    document.summary = ranking(document, 7, None, order_ranked, corpus_idfs, {"rank_option": "rrf", "mmr": False})
+    document.summary = ranking(document, 8, 1010, order_ranked, corpus_idfs, {"rank_option": "rrf", "mmr": False})
 #     #print(document.id, document.summary)
 #
 #     document_sentences = document.text_sentences
