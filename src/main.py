@@ -23,7 +23,6 @@ from typing import List
 import nltk
 
 from data.document import Document
-from helper.mockDataVisualize import mockData
 
 from src.mainFunctions.indexing import indexing
 from src.helper.documentHelper import read_files
@@ -75,18 +74,7 @@ def evaluation(documents: List[Document]):
 
 
 print("Start")
-# visualize("VisualizeOutput1.txt", mockData(), 1)
-# visualize("VisualizeOutput2.txt", mockData(), 2)
-# visualize("VisualizeOutput3.txt", mockData(), 3)
 
-
-# documents_no_preprocessing = read_files(False)
-# documents_preprocessing = read_files(True)
-#
-
-# documents_preprocessing = read_files(True, ["business"])
-# print("HI")
-# documents_preprocessing2 = read_files(True)
 
 order_ranked = True
 text_processing = True
