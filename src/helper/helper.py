@@ -1,5 +1,7 @@
 import nltk
 import re
+import csv
+
 
 
 def extract_sentences(summary_text, news_text):
@@ -19,3 +21,11 @@ def extract_sentences(summary_text, news_text):
 
     tokens = nltk.sent_tokenize(summary_text)
     return tokens
+
+def write_to_csv(file_name, header, data):
+    with open(f'${file_name}', 'w', encoding='UTF8') as f:
+        writer = csv.writer(f)
+
+        writer.writerow(header)
+
+        writer.writerows(data)

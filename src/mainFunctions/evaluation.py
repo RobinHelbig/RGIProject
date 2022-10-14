@@ -77,7 +77,10 @@ def calculate_precision_recall_tables_and_MAP_param(summary, true_pos):
         if t in true_pos:
             true_pos_counter = true_pos_counter + 1
             incremented = True
-        recall_table.append(true_pos_counter / recall_denominator)
+        if recall_denominator == 0:
+            recall_table.append(0)
+        else:
+            recall_table.append(true_pos_counter / recall_denominator)
         precision_denominator = precision_denominator + 1
         precision_table.append(true_pos_counter / precision_denominator)
         if incremented:
