@@ -7,7 +7,7 @@ from src.helper.textProcessingHelper import getSentences, getTerms
 from src.mainFunctions.indexing import indexing
 
 
-def get_tf_or_tfidf_scores(terms: [str], sentence_index: int, inverted_index: {str: IndexEntry}, corpus_idfs: {str: float}):
+def get_tf_or_tfidf_scores(terms: [str], inverted_index_pos: int, inverted_index: {str: IndexEntry}, corpus_idfs: {str: float}):
     scores: {str: float} = {}
 
     for term_index, term in enumerate(terms, start=0):
@@ -16,8 +16,8 @@ def get_tf_or_tfidf_scores(terms: [str], sentence_index: int, inverted_index: {s
 
         i = inverted_index[term]
 
-        if sentence_index != -1:
-            inverted_index_entry = list(filter(lambda o: o.document_id == sentence_index, i.occurrences))
+        if inverted_index_pos != -1:
+            inverted_index_entry = list(filter(lambda o: o.document_id == inverted_index_pos, i.occurrences))
             if len(inverted_index_entry) == 0:
                 continue
 
@@ -45,15 +45,15 @@ def get_tf_or_tfidf_scores(terms: [str], sentence_index: int, inverted_index: {s
     return scores
 
 
-def get_tfs(terms: [str], sentence_index: int, inverted_index: {str: IndexEntry}) -> {str: float}:
-    return get_tf_or_tfidf_scores(terms, sentence_index, inverted_index, None)
+def get_tfs(terms: [str], inverted_index_pos: int, inverted_index: {str: IndexEntry}) -> {str: float}:
+    return get_tf_or_tfidf_scores(terms, inverted_index_pos, inverted_index, None)
 
 
-def get_tfidfs(terms: [str], sentence_index: int, inverted_index: {str: IndexEntry}, corpus_idfs: {str: float}) -> {str: float}:
-    return get_tf_or_tfidf_scores(terms, sentence_index, inverted_index, corpus_idfs)
+def get_tfidfs(terms: [str], inverted_index_pos: int, inverted_index: {str: IndexEntry}, corpus_idfs: {str: float}) -> {str: float}:
+    return get_tf_or_tfidf_scores(terms, inverted_index_pos, inverted_index, corpus_idfs)
 
 
-def get_BM25(document_terms: [str], sentence_index: int, sentence_length: float, avg_sentence_length: float,
+def get_BM25(document_terms: [str], inverted_index_pos: int, sentence_length: float, avg_sentence_length: float,
              inverted_index: {str: IndexEntry}, corpus_idfs: {str: float}) -> float:
     bm25_score: float = 0.0
     k = 1.2
@@ -63,7 +63,7 @@ def get_BM25(document_terms: [str], sentence_index: int, sentence_length: float,
         i = inverted_index[document_term]
         idf = corpus_idfs[document_term]
 
-        inverted_index_entry = list(filter(lambda o: o.document_id == sentence_index, i.occurrences))
+        inverted_index_entry = list(filter(lambda o: o.document_id == inverted_index_pos, i.occurrences))
         if len(inverted_index_entry) == 0:
             continue
 
@@ -95,13 +95,13 @@ def mmr_next_sentence(current_document: list[(int, list[str])], current_summary:
     document_tfidfs = get_tfidfs(document_terms, -1, inverted_index_current_document, corpus_idfs)
     current_summary_tfidfs: list[{str: float}] = list()
 
-    for sentence in current_summary:
-        tfidfs = get_tfidfs(sentence[1], sentence[0], inverted_index_current_summary, corpus_idfs)
+    for inverted_index_pos, sentence in enumerate(current_summary, start=0):
+        tfidfs = get_tfidfs(sentence[1], inverted_index_pos, inverted_index_current_summary, corpus_idfs)
         current_summary_tfidfs.append(tfidfs)
 
     sentence_scores = list[(int, int)]()
-    for sentence in current_document:
-        tfidfs = get_tfidfs(sentence[1], sentence[0], inverted_index_current_document, corpus_idfs)
+    for inverted_index_pos, sentence in enumerate(current_document, start=0):
+        tfidfs = get_tfidfs(sentence[1], inverted_index_pos, inverted_index_current_document, corpus_idfs)
 
         sim_sentence_document = 0.0
         for term in tfidfs:

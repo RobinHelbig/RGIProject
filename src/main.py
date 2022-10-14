@@ -84,35 +84,29 @@ corpus_idfs: {str: float} = {}
 for v in index:
     corpus_idfs[v] = index[v].inverted_document_frequency
 
-for document in documents:
-    document.summary = ranking(document, 8, 1010, order_ranked, corpus_idfs, {"rank_option": "rrf", "mmr": False})
-#     #print(document.id, document.summary)
-#
-#     document_sentences = document.text_sentences
-#     summary_sentences = document.summary
-#     reference_summary_sentences = document.referenceSummary
+# for document in documents:
+    # document.summary = ranking(document, 8, 1010, order_ranked, corpus_idfs, {"rank_option": "rrf", "mmr": False})
 
-# visualize
-# evaluate
-#     if "Air Jamaica" in document.text:
-#         document.summary = ranking(document, 3, None, order_ranked, corpus_idfs, {"rank_option": "tf", "mmr": False})
-#         # print(document.id, document.summary)
-#
-#         document_sentences = document.text_sentences
-#         summary_sentences = document.summary
-#         reference_summary_sentences = document.referenceSummary
-#         print("tf", summary_sentences)
-#
-#         summary2 = ranking(document, 3, None, order_ranked, corpus_idfs, {"rank_option": "tf-idf", "mmr": False})
-#         print("tfidf", summary2)
-#
-#         summary3 = ranking(document, 3, None, order_ranked, corpus_idfs, {"rank_option": "bm25", "mmr": False})
-#         print("bm25",summary3)
-#
-#         summary4 = ranking(document, 3, None, order_ranked, corpus_idfs, {"rank_option": "rrf", "mmr": False})
-#         print("rrf",summary4)
-#
-#         summary5 = ranking(document, 3, None, order_ranked, corpus_idfs, {"rank_option": "tf-idf", "mmr": True})
-#         print("mmr",summary5)
+order_ranked = True
+text_processing = True
+max_sent = 8
+max_chars = 1010
+documents = read_files(text_processing, ["business"])
 
-evaluation(documents)
+corpus_index = indexing(list(map(attrgetter('text_terms'), documents)))
+corpus_idfs: {str: float} = {}
+
+for v in corpus_index:
+    corpus_idfs[v] = corpus_index[v].inverted_document_frequency
+
+document = documents[32]
+
+# summary_tf = ranking(document, max_sent, max_chars, order_ranked, corpus_idfs, {"rank_option": "tf", "mmr": False})
+# summary_tfidf = ranking(document, max_sent, max_chars, order_ranked, corpus_idfs, {"rank_option": "tf-idf", "mmr": False})
+# summary_bm25 = ranking(document, max_sent, max_chars, order_ranked, corpus_idfs, {"rank_option": "bm25", "mmr": False})
+# summary_rrf = ranking(document, max_sent, max_chars, order_ranked, corpus_idfs, {"rank_option": "rrf", "mmr": False})
+summary_mmr = ranking(document, max_sent, max_chars, order_ranked, corpus_idfs, {"rank_option": "tf-idf", "mmr": True})
+
+print(summary_mmr)
+print("\n")
+print(summary_tfidf)

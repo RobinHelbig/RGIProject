@@ -37,8 +37,8 @@ def getTerms(text: str, preprocessing: bool) -> list[str]:
             noun_phrases.append(term)
 
         # remove stop words
-        stop_words = set(stopwords.words('english'))
-        words = [w for w in words if not w.lower() in stop_words]
+        # stop_words = set(stopwords.words('english'))
+        # words = [w for w in words if not w.lower() in stop_words]
 
         # bigrams
         bigrams = list(nltk.bigrams(words))

@@ -39,7 +39,6 @@ def calculate_fbeta_measure(precision, recall):
         Fbeta = 0
     else:
         Fbeta = ((1 + math.pow(BETA, 2)) * precision * recall) / (math.pow(BETA, 2) * precision + recall)
-    print("Fbeta: " + str(Fbeta))
     return Fbeta
 
 
