@@ -35,7 +35,7 @@ def indexing(corpus: list[list[str]]) -> {str: IndexEntry}:
 
 
 def getTermDict(text: list[str]) -> {str: int}:
-    word_dict = {str: int}
+    word_dict: {str: int} = {}
     for word in text:
         count = 1
         if word in word_dict:
