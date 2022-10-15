@@ -5,7 +5,9 @@ import csv
 
 
 def extract_sentences(summary_text, news_text):
-    point_locations = [m.start() for m in re.finditer('\\.', summary_text)]
+    if "?" in summary_text:
+        print("HI")
+    point_locations = [m.start() for m in re.finditer('[.?!]', summary_text)]
     point_locations = point_locations[:-1]
     spaces_inserted = 0
 

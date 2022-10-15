@@ -80,8 +80,8 @@ def get_BM25(document_terms: [str], inverted_index_pos: int, sentence_length: fl
 
 
 def mmr_next_sentence(current_document: list[(int, list[str])], current_summary: list[(int, list[str])],
-                      corpus_idfs: {str: float}) -> (int, [str]):
-    lam = 0.5
+                      corpus_idfs: {str: float}, lam: float) -> (int, [str]):
+
     document_terms: list[str] = []
     sentence_terms_current_document: list[list[str]] = []
     for sentence in current_document:
@@ -192,6 +192,7 @@ def ranking(document: Document, max_sentences: int, max_chars: int, order_ranked
             args: {str: any}) -> list[str]:
     rank_option = args["rank_option"] if "rank_option" in args else "tf-idf"  # "tf", "tf-idf", "bm25", "rrf"
     mmr = args["mmr"] if "mmr" in args else False  # True, False
+    lam = args["lam"] if "lam" in args else 0.5  # float
 
     summary = list[(int, str)]()  # additionally saves pos of sentence in document to help with order, is removed before return
     summary_char_count = 0.0
@@ -241,7 +242,7 @@ def ranking(document: Document, max_sentences: int, max_chars: int, order_ranked
             if len(summary) == max_sentences:
                 break
 
-            next_sentence = mmr_next_sentence(current_document_terms, current_summary_terms, corpus_idfs)
+            next_sentence = mmr_next_sentence(current_document_terms, current_summary_terms, corpus_idfs, lam)
             next_sentence_index = next_sentence[0]
             next_sentence_text = document.text_sentences[next_sentence_index]
             next_sentence_terms = next_sentence[1]

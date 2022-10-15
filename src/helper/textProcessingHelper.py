@@ -20,10 +20,10 @@ def getTerms(text: str, preprocessing: bool) -> list[str]:
     words = nltk.word_tokenize(text)
 
     if preprocessing:
-        regexp = re.compile(r'[a-zA-Z0-9]')
+        # regexp = re.compile(r'[a-zA-Z0-9]')
         # print("before", words)
         # remove punctuation
-        words = list(filter(lambda word: regexp.search(word), words))
+        # words = list(filter(lambda word: regexp.search(word), words))
 
         # noun phrases
         noun_phrases = list()

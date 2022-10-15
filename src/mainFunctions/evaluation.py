@@ -2,6 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
+from src.helper.textProcessingHelper import getTerms
+from src.mainFunctions.indexing import indexing
+from src.mainFunctions.ranking import get_tfidfs
+
 BETA = 0.5
 CATEGORIES = ['business', 'entertainment', 'politics', 'sport', 'tech']
 
@@ -38,6 +42,46 @@ def calculate_true_pos(document):
             if t1 == t2:
                 true_pos.append(t2)
     return true_pos
+
+
+def calculate_accuracy(document):
+    TP = 0
+    TN = 0
+    All = len(document.text_sentences)
+    for sent in document.text_sentences:
+        is_in_ref_summary = sent in document.referenceSummary
+        is_in_summary = sent in document.summary
+
+        if is_in_summary and is_in_ref_summary:
+            TP += 1
+        if not is_in_summary and not is_in_ref_summary:
+            TN += 1
+
+    return (TP + TN) / All
+
+
+def calculate_redundancy(summary: [str], preprocessing) -> float:
+    summary_terms: list[str] = []
+    summary_sentence_terms: list[list[str]] = []
+    for sentence in summary:
+        sentence_terms = getTerms(sentence, preprocessing)
+        summary_sentence_terms.append(sentence_terms)
+        summary_terms += sentence_terms
+
+    inverted_index = indexing(summary_sentence_terms)
+
+    summary_tfs = get_tfidfs(summary_terms, -1, inverted_index, None)
+
+    sim = 0
+
+    for inverted_index_pos, sentence_terms in enumerate(summary_sentence_terms, start=0):
+        sentence_tfs = get_tfidfs(sentence_terms, inverted_index_pos, inverted_index, None)
+        for term in sentence_tfs:
+            sentence_score = sentence_tfs[term]
+            summary_score = summary_tfs[term]
+            sim += (sentence_score * summary_score)
+
+    return sim
 
 def calculate_precision_recall(reference_summary, summary, true_pos):
     TP = len(true_pos)
