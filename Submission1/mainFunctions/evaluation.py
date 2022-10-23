@@ -2,9 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
-from src.helper.textProcessingHelper import getTerms
-from src.mainFunctions.indexing import indexing
-from src.mainFunctions.ranking import get_tfidfs
+from helper.textProcessingHelper import getTerms
+from mainFunctions.indexing import indexing
+from mainFunctions.ranking import get_tfidfs
 
 BETA = 0.5
 CATEGORIES = ['business', 'entertainment', 'politics', 'sport', 'tech']

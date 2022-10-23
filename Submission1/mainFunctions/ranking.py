@@ -1,10 +1,9 @@
 from math import log10
 from typing import List, Dict
 
-from src.data.document import Document
-from src.data.index import IndexEntry
-from src.helper.textProcessingHelper import getSentences, getTerms
-from src.mainFunctions.indexing import indexing
+from data.document import Document
+from data.index import IndexEntry
+from mainFunctions.indexing import indexing
 
 
 def get_tf_or_tfidf_scores(terms: [str], inverted_index_pos: int, inverted_index: {str: IndexEntry}, corpus_idfs: {str: float}):

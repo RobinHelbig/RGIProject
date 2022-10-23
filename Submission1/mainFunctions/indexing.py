@@ -1,10 +1,7 @@
 from math import log10
 
-import nltk
 
-from src.data.document import Document
-from src.data.index import IndexEntry, Occurrence
-from src.helper.textProcessingHelper import getTerms
+from data.index import IndexEntry, Occurrence
 
 
 def indexing(corpus: list[list[str]]) -> {str: IndexEntry}:
