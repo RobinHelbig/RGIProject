@@ -14,6 +14,11 @@ summaryDic = 'Summaries'
 #categories = Category._member_names_
 categories_default = ['business', 'entertainment', 'politics', 'sport', 'tech']
 
+def categoryToInt(category: str):
+    return categories_default.index(category)
+
+def intToCategory(number: int):
+    return categories_default[number]
 
 def extract_sentences(summary_text, news_text):
     point_locations = [m.start() for m in re.finditer('[.?!]', summary_text)]
