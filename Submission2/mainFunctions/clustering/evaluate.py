@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import silhouette_score, adjusted_rand_score
 from sklearn.metrics.cluster import contingency_matrix
 
@@ -23,8 +24,19 @@ def getTrueLabels(documents: list[Document]) -> list[int]:
 def evaluate(cluster: list[int], documents: list[Document], args: {str: any}):
     n_clusters = args["n_clusters"] if "n_clusters" in args else 5
 
-    # sil_score = silhouette_score(vectorspace, cluster_labels, metric='cosine')
-    #
-    # ran_score = adjusted_rand_score(cluster_labels, true_labels)
-    #
-    # pur_score = purity(cluster_labels, true_labels)
+    document_texts = list[str]()
+    for document in documents:
+        document_texts.append(document.text)
+
+    vectorizer = TfidfVectorizer(use_idf=True)
+    # vectorizer = TfidfVectorizer(use_idf=True, max_df=0.2)
+    vectorspace = vectorizer.fit_transform(document_texts)
+    vectorspace = vectorspace.toarray()
+
+    sil_score = silhouette_score(vectorspace, cluster, metric='cosine')
+
+    true_labels = getTrueLabels(documents)
+
+    ran_score = adjusted_rand_score(cluster, true_labels)
+
+    pur_score = purity(cluster, true_labels)
