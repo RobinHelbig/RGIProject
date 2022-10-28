@@ -9,7 +9,7 @@
 # d3 -> [1, 2, 3, 4, 5]
 # d4 -> [1, 2, 3, 4, 5]
 # c2 -> [median, median, median, median, median] -> sort -> most relevant terms
-from statistics import median
+from statistics import median, mean
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 
@@ -18,6 +18,8 @@ from data.document import Document
 
 def interpret(cluster: list[int], documents: list[Document], args: {str: any}) -> list[(str, int)]:
     n_clusters = args["n_clusters"] if "n_clusters" in args else 5
+    max_df = args["max_df"] if "max_df" in args else None
+    criteria = args["criteria"] if "criteria" in args else "median"
 
     cluster_relevant_terms = list[(str, int)]()
 
@@ -26,7 +28,10 @@ def interpret(cluster: list[int], documents: list[Document], args: {str: any}) -
         document_texts.append(document.text)
 
     vectorizer = TfidfVectorizer(use_idf=True)
-    # vectorizer = TfidfVectorizer(use_idf=True, max_df=0.2)
+
+    if max_df is not None:
+        vectorizer = TfidfVectorizer(use_idf=True, max_df=max_df)
+
     vectorspace = vectorizer.fit_transform(document_texts)
     vectorspace = vectorspace.toarray()
     termNames = vectorizer.get_feature_names_out()
@@ -35,7 +40,7 @@ def interpret(cluster: list[int], documents: list[Document], args: {str: any}) -
     for cluster_index in range(0, n_clusters):
         term_tfidf_list = list[list[float]]()  # term list -> tdidf per document
         for i in range(0, termCount):
-            term_tfidf_list[i] = list[int]()
+            term_tfidf_list.append(list[int]())
 
         for document_index, document_tfidfs in enumerate(vectorspace, start=0):
             if cluster[document_index] == cluster_index:
@@ -47,7 +52,10 @@ def interpret(cluster: list[int], documents: list[Document], args: {str: any}) -
             term_tfidfs = term_tfidf_list[i]
 
             term_name = termNames[i]
+
             median_term_tdidf = median(term_tfidfs)
+            if criteria == "mean":
+                median_term_tdidf = mean(term_tfidfs)
 
             term_median_tdidfs.append((term_name, median_term_tdidf))
 
