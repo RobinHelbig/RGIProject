@@ -3,6 +3,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import silhouette_score, adjusted_rand_score
 from sklearn.metrics.cluster import contingency_matrix
 from scipy.cluster.hierarchy import dendrogram
+from sklearn.decomposition import PCA
+import pandas as pd
+import matplotlib.pyplot as plt
 
 from data.document import Document
 from helper.documentHelper import categoryToInt
@@ -45,8 +48,47 @@ def plot_dendrogram(model, **kwargs):
     # Plot the corresponding dendrogram
     dendrogram(linkage_matrix, **kwargs)
 
+def pca_plot(cluster: list[int], documents: list[Document]):
+    document_texts = list[str]()
+    for document in documents:
+        document_texts.append(document.text)
 
-def evaluate(cluster: list[int], documents: list[Document], args: {str: any}):
+    vectorizer = TfidfVectorizer(use_idf=True)
+    vectorspace = vectorizer.fit_transform(document_texts)
+    vectorspace = vectorspace.toarray()
+
+    newspace = PCA(n_components=2).fit_transform(vectorspace)
+
+    x, y = newspace[:, 0], newspace[:, 1]
+
+    colors = {0: 'red',
+              1: 'blue',
+              2: 'green',
+              3: 'yellow',
+              4: 'orange',
+              5: 'purple',
+              6: 'magenta',
+              7: 'olivedrab',
+              8: 'hotpink',
+              9: 'darkmagenta'}
+
+    df = pd.DataFrame({'x': x, 'y': y, 'label': cluster})
+    groups = df.groupby('label')
+
+    fig, ax = plt.subplots(figsize=(20, 13))
+
+    for name, group in groups:
+        ax.plot(group.x, group.y, marker='o', linestyle='', ms=5,
+                color=colors[name], label='cluster' + str(name), mec='none')
+        ax.set_aspect('auto')
+        ax.tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='off')
+        ax.tick_params(axis='y', which='both', left='off', top='off', labelleft='off')
+
+    ax.legend()
+    ax.set_title("Generated clusters")
+    plt.show()
+
+def evaluate(cluster: list[int], documents: list[Document]):
     document_texts = list[str]()
     for document in documents:
         document_texts.append(document.text)
