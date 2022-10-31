@@ -23,6 +23,28 @@ def get_BM25(document_terms: [str], sentence_length: float, avg_sentence_length:
         if tf != 0:
             tf = 1 + log10(tf)
 
+"""
+clusters
+"""
+# args = {'n_clusters': 5, 'max_df': 0.2, 'criteria': 'mean'}
+#
+# text_processing = True
+# documents = read_files(text_processing)
+# cluster_model = clustering(documents, args)
+# cluster_data = cluster_model.labels_
+#
+# relevant_terms = interpret(cluster_data, documents, args)
+# evaluation = evaluate(cluster_data, documents, args)
+# plot_dendrogram(cluster_model, truncate_mode='level', p=3)
+#
+
+""" relevance feedback """
+text_processing = True
+documents = read_files(text_processing)
+print(documents[1].text_sentences)
+print(feature_extraction_tf_idf(d=documents[1], use_idf=True))
+
+"""bm25"""
         bm25_score += idf * ((k + 1) * tf) / (tf + k * (1 - b + b * sentence_length / avg_sentence_length))
 
     return bm25_score
