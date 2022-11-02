@@ -1,7 +1,5 @@
 from helper.documentHelper import read_files
-from mainFunctions.graph.bufor import extract_sentences
 from mainFunctions.graph.pageRank import undirected_page_rank
-
 
 # from math import log10
 # from operator import attrgetter
@@ -76,14 +74,12 @@ clusters
 #
 #     print("score of sentence " + str(sentence_index) + ": " + str(bm25_score))
 
-print('hello')
 text_processing = True
+threshold = 0.3
+p = 7
 documents = read_files(text_processing)
-undirected_page_rank(documents)
+undirected_page_rank(documents, threshold, p)
 
-
-# path = "../BBC News Summary/lorem.txt"
-# print(extract_sentences(path))
 
 
 
