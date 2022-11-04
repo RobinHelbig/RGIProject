@@ -3,7 +3,6 @@ from operator import attrgetter
 
 from data.index import IndexEntry
 from helper.documentHelper import read_files
-<<<<<<< HEAD
 from mainFunctions.indexing import indexing
 
 def get_BM25(document_terms: [str], sentence_length: float, avg_sentence_length: float,
@@ -23,16 +22,11 @@ def get_BM25(document_terms: [str], sentence_length: float, avg_sentence_length:
         tf = inverted_index_entry[0].frequency
         if tf != 0:
             tf = 1 + log10(tf)
-=======
-from mainFunctions.clustering.clustering import clustering
-from mainFunctions.clustering.evaluate import evaluate, plot_dendrogram
-from mainFunctions.clustering.interpret import interpret
 from mainFunctions.relevance.extraction import check_accuracy_documents_knn_idf, check_accuracy_documents_knn_no_idf, \
     check_accuracy_documents_bayes_no_idf, check_accuracy_documents_bayes_idf, feature_extraction_tf_idf, \
     map_vectors_to_data_frame, naive_bayes, knn_model, check_accuracy, check_accuracy_documents_bayes_no_idf_position, \
     check_accuracy_documents_bayes_idf_position, check_accuracy_documents_bayes_idf_cosine, check_accuracy_documents_bayes_no_idf_cosine
 import numpy as np
->>>>>>> ddebfb1 (Budny pat finished)
 
 """
 clusters
