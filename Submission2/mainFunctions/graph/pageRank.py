@@ -103,12 +103,14 @@ def undirected_page_rank(documents: list[Document], threshold, p):
         similarity_matrix = np.array(build_graph(document, threshold, True))
         nx_graph = nx.from_numpy_array(similarity_matrix)
         scores = nx.pagerank(nx_graph, alpha=0.85, max_iter=50)
-        get_page_rank_summary(document, p, scores)
+        news_top = get_page_rank_summary(document, p, scores)
+        get_page_rank_sentences(document.text_sentences, news_top)
 
     similarity_matrix = np.array(build_graph(documents[0], threshold, True))
     nx_graph = nx.from_numpy_array(similarity_matrix)
     scores = nx.pagerank(nx_graph, alpha=0.85, max_iter=50)
-    get_page_rank_summary(documents[0], p, scores)
+    news_top = get_page_rank_summary(documents[0], p, scores)
+    get_page_rank_sentences(documents[0].text_sentences, news_top)
 
 
 
