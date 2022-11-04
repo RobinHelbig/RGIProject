@@ -1,5 +1,6 @@
 from helper.documentHelper import read_files
-from mainFunctions.graph.pageRank import undirected_page_rank
+from mainFunctions.graph.pageRank import evaluate_page_rank
+from Submission2.helper.pageRankEvaluation import draw_MAP_chart
 
 # from math import log10
 # from operator import attrgetter
@@ -74,12 +75,16 @@ clusters
 #
 #     print("score of sentence " + str(sentence_index) + ": " + str(bm25_score))
 
+DOCUMENTS = ['doc0', 'doc50', 'doc100']
+
 text_processing = True
-threshold = 0.3
+threshold = 0.2
 p = 7
 documents = read_files(text_processing)
-undirected_page_rank(documents, threshold, p)
 
+#undirected_page_rank(documents, threshold, p)
+doc0_ev = evaluate_page_rank(documents[0], threshold, p)
+doc1_ev = evaluate_page_rank(documents[50], threshold, p)
+doc2_ev = evaluate_page_rank(documents[100], threshold, p)
 
-
-
+draw_MAP_chart(doc0_ev, doc1_ev, doc2_ev, DOCUMENTS)
