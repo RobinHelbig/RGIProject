@@ -1,14 +1,3 @@
-# t1t2t3t4t5
-#
-# c1:
-# d1 -> [1, 2, 3, 4, 5]
-# d2 -> [1, 2, 3, 4, 5]
-# c1 -> [median, median, median, median, median] -> sort -> most relevant terms
-#
-# c2:
-# d3 -> [1, 2, 3, 4, 5]
-# d4 -> [1, 2, 3, 4, 5]
-# c2 -> [median, median, median, median, median] -> sort -> most relevant terms
 from statistics import median, mean
 
 from sklearn.feature_extraction.text import TfidfVectorizer
